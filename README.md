@@ -1,9 +1,10 @@
 <p align="center">
-<img src="./img/callapitter.png" alt="callapitter" width="250"/>
+    <h1>callapitter</h1>
+    <img src="./img/callapitter.png" alt="callapitter" width="250"/>
+    <i>send and save http requests with a terminal ui</i>
 </p>
 
-# callapitter
-> Send and save HTTP requests from your terminal
+[![Go Report Card](https://goreportcard.com/badge/github.com/nealwp/callapitter)]
 
 ## Installation
 
