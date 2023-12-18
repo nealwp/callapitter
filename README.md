@@ -5,7 +5,7 @@
     <p align="center">send and save http requests with a terminal ui</p>
 </p>
 
-[![GitHub tag](https://img.shields.io/github/tag/nealwp/callapitter.svg)](https://github.com/nealwp/callapitter/releases/latest) [![Go Report Card](https://goreportcard.com/badge/github.com/nealwp/callapitter)](https://goreportcard.com/report/github.com/nealwap/callapitter) [![GitHub Releases](https://img.shields.io/github/downloads/nealwp/callapitter/total)](https://github.com/nealwp/callapitter/releases)
+[![GitHub tag](https://img.shields.io/github/tag/nealwp/callapitter.svg)](https://github.com/nealwp/callapitter/releases/latest) [![Go Report Card](https://goreportcard.com/badge/github.com/nealwp/callapitter)](https://goreportcard.com/report/github.com/nealwp/callapitter) [![GitHub Releases](https://img.shields.io/github/downloads/nealwp/callapitter/total)](https://github.com/nealwp/callapitter/releases)
 
 ## Installation
 
