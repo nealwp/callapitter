@@ -1,7 +1,7 @@
 # callapitter
 ## Send and save HTTP requests from your terminal
 
-![callapitter-logo](./img/callapitter.png)
+<img src="./img/callapitter.png" alt="callapitter" width="200"/>
 
 ## Installation
 
