@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
+    "fmt"
     "bytes"
     "encoding/json"
 
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
+    "github.com/gdamore/tcell/v2"
+    "github.com/rivo/tview"
 )
 
 var BG_COLOR = tcell.ColorDefault
@@ -24,6 +24,7 @@ type HttpRequest struct {
     Endpoint string
     Headers []Header
     Body string
+    LastResponse string
 }
 
 var defaultHeaders = []Header {
@@ -31,11 +32,11 @@ var defaultHeaders = []Header {
 }
 
 var requests = []HttpRequest {
-    {"GET", "/api/test/hello", defaultHeaders, ""},
-    {"GET", "/api/test/health", defaultHeaders, ""},
-    {"POST", "/api/test/user", defaultHeaders, "{\"name\": \"foo\", \"age\": 99}"},
-    {"GET", "/api/test/users", defaultHeaders, ""},
-    {"GET", "/api/test/some/really/long/address", defaultHeaders, ""},
+    {"GET", "/api/test/hello", defaultHeaders, "", ""},
+    {"GET", "/api/test/health", defaultHeaders, "", ""},
+    {"POST", "/api/test/user", defaultHeaders, "{\"name\": \"foo\", \"age\": 99}", ""},
+    {"GET", "/api/test/users", defaultHeaders, "", ""},
+    {"GET", "/api/test/some/really/long/address", defaultHeaders, "", ""},
 }
 
 func prettyPrintJSON(inputJSON string) (string) {
@@ -77,7 +78,7 @@ func main() {
     methodDropdown.SetBorder(true)
     methodDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
 
-    hosts := []string{"http://localhost:8000"}
+    hosts := []string{"http://localhost:8000", "https://jsonplaceholder.typicode.com"}
 
     hostDropdown := tview.NewDropDown().SetOptions(hosts, nil).SetCurrentOption(0).SetFieldBackgroundColor(BG_COLOR).SetFieldTextColor(BG_COLOR)
     hostDropdown.SetTitle("Host [C-h]")
@@ -98,17 +99,6 @@ func main() {
 
     urlInput.SetInputCapture(urlInputCapture)
 
-    sendBtn := tview.NewButton("Send [⏎]")
-    sendBtn.SetBorder(true)
-    sendBtn.SetStyle(tcell.StyleDefault.Background(BG_COLOR))
-    sendBtn.SetLabelColorActivated(tcell.ColorDarkBlue)
-    sendBtn.SetActivatedStyle(tcell.StyleDefault.Background(BG_COLOR))
-
-    sendRequest := func() {
-       setStatus("req sent")
-    }
-
-    sendBtn.SetSelectedFunc(sendRequest)
 
     headersTable := tview.NewFlex()
     headersTable.SetBackgroundColor(BG_COLOR)
@@ -163,22 +153,14 @@ func main() {
 
     tabs := tview.NewFlex().AddItem(headersTab, 14, 1, false).AddItem(bodyTab, 14, 1, false)
 
+    pages.SwitchToPage("headers")
+
     reqList := tview.NewList()
 
     for _, r := range requests {
         reqList.AddItem(fmt.Sprintf("%-4s", r.Method) + "  " + r.Endpoint, "", 0, nil)
     }
 
-    reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
-        selected := requests[index]
-
-        methodIdx := findMethodIndex(selected.Method)
-        methodDropdown.SetCurrentOption(methodIdx)
-        urlInput.SetText(selected.Endpoint)
-        body := prettyPrintJSON(selected.Body)
-        displayHeaders(selected.Headers)
-        reqBody.SetText(body, false)
-    })
 
     reqList.ShowSecondaryText(false)
     reqList.SetBorder(true)
@@ -203,29 +185,55 @@ func main() {
 
     reqList.SetInputCapture(reqListInputCapture)
 
-    resBox := tview.NewBox()
+    resBox := tview.NewTextView()
     resBox.SetTitle("Response")
     resBox.SetTitleAlign(tview.AlignLeft)
     resBox.SetBackgroundColor(BG_COLOR)
     resBox.SetBorder(true)
 
-    layout := tview.NewFlex().
-        AddItem(reqList, 50, 1, true).
-        AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-            AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-                AddItem(methodDropdown, 15, 1, false).
-                AddItem(hostDropdown, 25, 1, false).
-                AddItem(urlInput, 0, 1, false).
-                AddItem(sendBtn, 12, 1, false),
-            3, 1, false).
-            AddItem(tabs, 1, 0, false).
-            AddItem(pages, 0, 5, false).
-            AddItem(resBox, 0, 5, false).
-            AddItem(statusBar, 3, 1, false), 
-            0, 2, false,
-        )
+    reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+        selected := requests[index]
 
-    
+        methodIdx := findMethodIndex(selected.Method)
+        methodDropdown.SetCurrentOption(methodIdx)
+        urlInput.SetText(selected.Endpoint)
+        displayHeaders(selected.Headers)
+        reqBody.SetText(prettyPrintJSON(selected.Body), false)
+        resBox.SetText(prettyPrintJSON(selected.LastResponse))
+    })
+
+    sendRequest := func() {
+        exampleText := "{\"hello\": \"this\", \"is\": \"my\", \"example\": \"json\", \"number\": 1}"
+        // this should actually save the response to the req struct
+        resBox.SetText(prettyPrintJSON(exampleText))
+        setStatus("req sent")
+    }
+
+    sendBtn := tview.NewButton("Send [⏎]")
+    sendBtn.SetBorder(true)
+    sendBtn.SetStyle(tcell.StyleDefault.Background(BG_COLOR))
+    sendBtn.SetLabelColorActivated(tcell.ColorDarkBlue)
+    sendBtn.SetActivatedStyle(tcell.StyleDefault.Background(BG_COLOR))
+
+    sendBtn.SetSelectedFunc(sendRequest)
+
+    layout := tview.NewFlex().
+    AddItem(reqList, 50, 1, true).
+    AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+    AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
+    AddItem(methodDropdown, 15, 1, false).
+    AddItem(hostDropdown, 45, 1, false).
+    AddItem(urlInput, 0, 1, false).
+    AddItem(sendBtn, 12, 1, false),
+    3, 1, false).
+    AddItem(tabs, 1, 0, false).
+    AddItem(pages, 0, 5, false).
+    AddItem(resBox, 0, 5, false).
+    AddItem(statusBar, 3, 1, false), 
+    0, 2, false,
+)
+
+
     app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
         switch event.Key() {
         case tcell.KeyCtrlC:
@@ -256,7 +264,7 @@ func main() {
     app.EnableMouse(true)
     app.SetRoot(layout, true)
 
-	if err := app.Run(); err != nil {
-		panic(err)
-	}
+    if err := app.Run(); err != nil {
+        panic(err)
+    }
 }
