@@ -51,24 +51,7 @@ func prettyPrintJSON(inputJSON string) (string) {
 func main() {
 
     statusBar := ui.NewStatusBar() 
-
-    reqMethods := []string{"GET", "POST", "PUT", "DELETE"}
-
-    findMethodIndex := func(method string) int {
-        for i, v := range reqMethods {
-            if v == method {
-                return i
-            }
-        }
-        return -1
-    }
-
-    methodDropdown := tview.NewDropDown().SetOptions(reqMethods, nil).SetCurrentOption(0).SetFieldBackgroundColor(BG_COLOR).SetFieldTextColor(BG_COLOR)
-    methodDropdown.SetTitle("Method [C-e]")
-    methodDropdown.SetTitleAlign(tview.AlignLeft)
-    methodDropdown.SetBackgroundColor(BG_COLOR)
-    methodDropdown.SetBorder(true)
-    methodDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
+    methodDropdown := ui.NewMethodDropdown()
 
     hosts := []string{"http://localhost:8000", "https://jsonplaceholder.typicode.com"}
 
@@ -185,9 +168,7 @@ func main() {
 
     reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
         selected := requests[index]
-
-        methodIdx := findMethodIndex(selected.Method)
-        methodDropdown.SetCurrentOption(methodIdx)
+        methodDropdown.SetCurrentOption(selected.Method)
         urlInput.SetText(selected.Endpoint)
         displayHeaders(selected.Headers)
         reqBody.SetText(prettyPrintJSON(selected.Body), false)
@@ -213,7 +194,7 @@ func main() {
     AddItem(reqList, 50, 1, true).
     AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
     AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-    AddItem(methodDropdown, 15, 1, false).
+    AddItem(methodDropdown.GetPrimitive(), 15, 1, false).
     AddItem(hostDropdown, 45, 1, false).
     AddItem(urlInput, 0, 1, false).
     AddItem(sendBtn, 12, 1, false),
@@ -244,7 +225,7 @@ func main() {
         case tcell.KeyCtrlU:
             app.SetFocus(urlInput)
         case tcell.KeyCtrlE:
-            app.SetFocus(methodDropdown)
+            app.SetFocus(methodDropdown.GetPrimitive())
         case tcell.KeyRune:
             if event.Rune() == 'q' && !urlInput.HasFocus() {
                 app.Stop()
