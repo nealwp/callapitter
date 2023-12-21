@@ -1,12 +1,13 @@
 package main
 
 import (
-    "fmt"
-    "bytes"
-    "encoding/json"
+	"bytes"
+	"encoding/json"
+	"fmt"
 
-    "github.com/gdamore/tcell/v2"
-    "github.com/rivo/tview"
+	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/ui"
+	"github.com/rivo/tview"
 )
 
 var BG_COLOR = tcell.ColorDefault
@@ -49,16 +50,7 @@ func prettyPrintJSON(inputJSON string) (string) {
 
 func main() {
 
-
-    statusBar := tview.NewTextView()
-    statusBar.SetBorder(true)
-    statusBar.SetBackgroundColor(BG_COLOR)
-    statusBar.SetTitle("Status")
-    statusBar.SetTitleAlign(tview.AlignLeft)
-
-    setStatus := func(msg string) {
-        statusBar.SetText(msg)
-    }
+    statusBar := ui.NewStatusBar() 
 
     reqMethods := []string{"GET", "POST", "PUT", "DELETE"}
 
@@ -206,7 +198,7 @@ func main() {
         exampleText := "{\"hello\": \"this\", \"is\": \"my\", \"example\": \"json\", \"number\": 1}"
         // this should actually save the response to the req struct
         resBox.SetText(prettyPrintJSON(exampleText))
-        setStatus("req sent")
+        statusBar.SetStatus("req sent")
     }
 
     sendBtn := tview.NewButton("Send [⏎]")
@@ -229,7 +221,7 @@ func main() {
     AddItem(tabs, 1, 0, false).
     AddItem(pages, 0, 5, false).
     AddItem(resBox, 0, 5, false).
-    AddItem(statusBar, 3, 1, false), 
+    AddItem(statusBar.GetPrimitive(), 3, 1, false), 
     0, 2, false,
 )
 
