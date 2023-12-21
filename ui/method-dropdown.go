@@ -1,6 +1,5 @@
 package ui
 
-
 import (
     "github.com/gdamore/tcell/v2"
     "github.com/rivo/tview"
@@ -13,8 +12,6 @@ type MethodDropdown struct {
 var reqMethods = []string{"GET", "POST", "PUT", "DELETE"}
 
 func NewMethodDropdown() *MethodDropdown {
-
-    reqMethods := []string{"GET", "POST", "PUT", "DELETE"}
 
     view := tview.NewDropDown()
     view.SetOptions(reqMethods, nil)

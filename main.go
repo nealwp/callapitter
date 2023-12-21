@@ -52,15 +52,7 @@ func main() {
 
     statusBar := ui.NewStatusBar() 
     methodDropdown := ui.NewMethodDropdown()
-
-    hosts := []string{"http://localhost:8000", "https://jsonplaceholder.typicode.com"}
-
-    hostDropdown := tview.NewDropDown().SetOptions(hosts, nil).SetCurrentOption(0).SetFieldBackgroundColor(BG_COLOR).SetFieldTextColor(BG_COLOR)
-    hostDropdown.SetTitle("Host [C-h]")
-    hostDropdown.SetTitleAlign(tview.AlignLeft)
-    hostDropdown.SetBackgroundColor(BG_COLOR)
-    hostDropdown.SetBorder(true)
-    hostDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
+    hostDropdown := ui.NewHostDropdown()
 
     urlInput := tview.NewInputField().SetFieldBackgroundColor(BG_COLOR).SetFieldTextColor(BG_COLOR)
     urlInput.SetBackgroundColor(BG_COLOR)
@@ -195,7 +187,7 @@ func main() {
     AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
     AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
     AddItem(methodDropdown.GetPrimitive(), 15, 1, false).
-    AddItem(hostDropdown, 45, 1, false).
+    AddItem(hostDropdown.GetPrimitive(), 45, 1, false).
     AddItem(urlInput, 0, 1, false).
     AddItem(sendBtn, 12, 1, false),
     3, 1, false).
@@ -217,7 +209,7 @@ func main() {
         case tcell.KeyCtrlR:
             app.SetFocus(reqList) 
         case tcell.KeyCtrlH:
-            app.SetFocus(hostDropdown)
+            app.SetFocus(hostDropdown.GetPrimitive())
         case tcell.KeyCtrlB:
             selectBodyTab()
         case tcell.KeyCtrlD:
