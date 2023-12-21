@@ -54,18 +54,7 @@ func main() {
     methodDropdown := ui.NewMethodDropdown()
     hostDropdown := ui.NewHostDropdown()
 
-    urlInput := tview.NewInputField().SetFieldBackgroundColor(BG_COLOR).SetFieldTextColor(BG_COLOR)
-    urlInput.SetBackgroundColor(BG_COLOR)
-    urlInput.SetBorder(true)
-    urlInput.SetTitle("URL [C-u]")
-    urlInput.SetTitleAlign(tview.AlignLeft)
-
-    urlInputCapture := func(event *tcell.EventKey) *tcell.EventKey {
-        return event
-    }
-
-    urlInput.SetInputCapture(urlInputCapture)
-
+    urlInput := ui.NewUrlInput() 
 
     headersTable := tview.NewFlex()
     headersTable.SetBackgroundColor(BG_COLOR)
@@ -188,7 +177,7 @@ func main() {
     AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
     AddItem(methodDropdown.GetPrimitive(), 15, 1, false).
     AddItem(hostDropdown.GetPrimitive(), 45, 1, false).
-    AddItem(urlInput, 0, 1, false).
+    AddItem(urlInput.GetPrimitive(), 0, 1, false).
     AddItem(sendBtn, 12, 1, false),
     3, 1, false).
     AddItem(tabs, 1, 0, false).
@@ -215,11 +204,11 @@ func main() {
         case tcell.KeyCtrlD:
             selectHeadersTab()
         case tcell.KeyCtrlU:
-            app.SetFocus(urlInput)
+            app.SetFocus(urlInput.GetPrimitive())
         case tcell.KeyCtrlE:
             app.SetFocus(methodDropdown.GetPrimitive())
         case tcell.KeyRune:
-            if event.Rune() == 'q' && !urlInput.HasFocus() {
+            if event.Rune() == 'q' && !urlInput.GetPrimitive().HasFocus() {
                 app.Stop()
             }
         }
