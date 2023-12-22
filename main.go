@@ -6,12 +6,9 @@ import (
 	"github.com/rivo/tview"
 )
 
-var BG_COLOR = tcell.ColorDefault
-
-var app = tview.NewApplication()
-
 func main() {
 
+    app := tview.NewApplication()
     layout := ui.NewAppLayout()
 
     app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
