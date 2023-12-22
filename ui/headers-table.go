@@ -16,7 +16,9 @@ type HeadersTable struct {
 func NewHeadersTable() *HeadersTable {
     view := tview.NewFlex()
     view.SetBackgroundColor(BG_COLOR)
-
+    view.SetTitle("Headers")
+    view.SetTitleAlign(tview.AlignLeft)
+    view.SetBorder(true)
     return &HeadersTable{ view: view }
 }
 

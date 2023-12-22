@@ -12,6 +12,9 @@ type RequestBodyArea struct {
 func NewRequestBodyArea() *RequestBodyArea {
     view := tview.NewTextArea()
     view.SetBackgroundColor(BG_COLOR)
+    view.SetBorder(true)
+    view.SetTitle("Body")
+    view.SetTitleAlign(tview.AlignLeft)
     view.SetTextStyle(tcell.StyleDefault.Background(BG_COLOR))
 
     return &RequestBodyArea{ view: view }
