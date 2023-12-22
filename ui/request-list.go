@@ -55,6 +55,15 @@ func (r *RequestList) SetContent(requests []HttpRequest) {
     }
 }
 
+// how do we get this fella to know about all those other components?
+// service? broadcast? domain event?
 
-
+    //reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+    //    selected := requests[index]
+    //    methodDropdown.SetCurrentOption(selected.Method)
+    //    urlInput.SetText(selected.Endpoint)
+    //    headersTable.DisplayHeaders(selected.Headers)
+    //    reqBody.SetText(selected.Body)
+    //    resBox.SetText(prettyPrintJSON(selected.LastResponse))
+    //})
 
