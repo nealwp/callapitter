@@ -2,17 +2,18 @@ package ui
 
 import (
     "github.com/rivo/tview"
+    "github.com/nealwp/callapitter/ui/components"
 )
 
 type AppLayout struct {
     view *tview.Flex
 }
 
-var defaultHeaders = []Header {
+var defaultHeaders = []ui.Header {
     {Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
 }
 
-var requests = []HttpRequest {
+var requests = []ui.HttpRequest {
     {Method: "GET", Endpoint: "/api/test/hello", Headers: defaultHeaders, Body: "", LastResponse: ""},
     {Method: "GET", Endpoint: "/api/test/health", Headers: defaultHeaders, Body: "", LastResponse: ""},
     {Method: "POST", Endpoint: "/api/test/user", Headers: defaultHeaders, Body: "{\"name\": \"foo\", \"age\": 99}", LastResponse: ""},
@@ -22,18 +23,18 @@ var requests = []HttpRequest {
 
 func NewAppLayout() *AppLayout {
 
-    statusBar := NewStatusBar() 
-    methodDropdown := NewMethodDropdown()
-    hostDropdown := NewHostDropdown()
-    urlInput := NewUrlInput() 
-    headersTable := NewHeadersTable() 
-    reqBody := NewRequestBodyArea()
+    statusBar := ui.NewStatusBar() 
+    methodDropdown := ui.NewMethodDropdown()
+    hostDropdown := ui.NewHostDropdown()
+    urlInput := ui.NewUrlInput() 
+    headersTable := ui.NewHeadersTable() 
+    reqBody := ui.NewRequestBodyArea()
 
-    reqList := NewRequestList() 
+    reqList := ui.NewRequestList() 
     reqList.SetContent(requests)
 
-    resBox := NewResponseView() 
-    sendBtn := NewSendButton() 
+    resBox := ui.NewResponseView() 
+    sendBtn := ui.NewSendButton() 
 
     view := tview.NewFlex().
     AddItem(reqList.GetPrimitive(), 50, 1, true).
