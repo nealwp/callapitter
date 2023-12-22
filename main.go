@@ -15,21 +15,16 @@ var BG_COLOR = tcell.ColorDefault
 var app = tview.NewApplication()
 
 
-type Header struct {
-    Key string
-    Value string
-}
-
 type HttpRequest struct {
     Method string
     Endpoint string
-    Headers []Header
+    Headers []ui.Header
     Body string
     LastResponse string
 }
 
-var defaultHeaders = []Header {
-    {"Authorization", "Bearer 12345ABCDEFG"},
+var defaultHeaders = []ui.Header {
+    {Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
 }
 
 var requests = []HttpRequest {
@@ -53,39 +48,16 @@ func main() {
     statusBar := ui.NewStatusBar() 
     methodDropdown := ui.NewMethodDropdown()
     hostDropdown := ui.NewHostDropdown()
-
     urlInput := ui.NewUrlInput() 
-
-    headersTable := tview.NewFlex()
-    headersTable.SetBackgroundColor(BG_COLOR)
-
-    displayHeaders := func(headers []Header) {
-        headersTable.Clear()
-        for _, h := range(headers) {
-            key := tview.NewInputField().SetFieldBackgroundColor(BG_COLOR)
-            key.SetBackgroundColor(BG_COLOR)
-            key.SetText(h.Key)
-            value := tview.NewInputField().SetFieldBackgroundColor(BG_COLOR)
-            value.SetBackgroundColor(BG_COLOR)
-            value.SetText(h.Value)
-            row := tview.NewFlex().SetDirection(tview.FlexColumn)
-            row.SetBackgroundColor(BG_COLOR)
-            row.AddItem(key, 20, 1, false)
-            row.AddItem(value, 20, 1, false)
-            headersTable.AddItem(row, 0, 1, false)
-        }
-    }
-
-    reqBody := tview.NewTextArea()
-    reqBody.SetBackgroundColor(BG_COLOR)
-    reqBody.SetTextStyle(tcell.StyleDefault.Background(BG_COLOR))
+    headersTable := ui.NewHeadersTable() 
+    reqBody := ui.NewRequestBodyArea()
 
     pages := tview.NewPages()
     pages.SetBackgroundColor(BG_COLOR)
     pages.SetBorder(true)
 
-    pages.AddPage("headers", headersTable, true, false)
-    pages.AddPage("body", reqBody, true, false)
+    pages.AddPage("headers", headersTable.GetPrimitive(), true, false)
+    pages.AddPage("body", reqBody.GetPrimitive(), true, false)
 
     headersTab := tview.NewButton("Headers [C-d]")
     headersTab.SetStyle(tcell.StyleDefault.Background(BG_COLOR))
@@ -151,8 +123,8 @@ func main() {
         selected := requests[index]
         methodDropdown.SetCurrentOption(selected.Method)
         urlInput.SetText(selected.Endpoint)
-        displayHeaders(selected.Headers)
-        reqBody.SetText(prettyPrintJSON(selected.Body), false)
+        headersTable.DisplayHeaders(selected.Headers)
+        reqBody.SetText(selected.Body)
         resBox.SetText(prettyPrintJSON(selected.LastResponse))
     })
 
@@ -201,6 +173,7 @@ func main() {
             app.SetFocus(hostDropdown.GetPrimitive())
         case tcell.KeyCtrlB:
             selectBodyTab()
+            app.SetFocus(reqBody.GetPrimitive())
         case tcell.KeyCtrlD:
             selectHeadersTab()
         case tcell.KeyCtrlU:
