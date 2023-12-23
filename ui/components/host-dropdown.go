@@ -26,6 +26,28 @@ func NewHostDropdown() *HostDropdown {
     view.SetBorder(true)
     view.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
 
+    view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+        currentOption, _ := view.GetCurrentOption()
+
+        if event.Key() == tcell.KeyRune {
+            switch event.Rune() {
+            case 'j':
+                nextOption := (currentOption + 1) % len(hosts)
+                view.SetCurrentOption(nextOption)
+                return nil
+            case 'k':
+                prevOption := (currentOption - 1 + len(hosts)) % len(hosts)
+                view.SetCurrentOption(prevOption)
+                return nil
+            }
+        } else if event.Key() == tcell.KeyEnter {
+            // set it here
+            return nil
+        }
+        
+        return event
+    })
+
     return &HostDropdown{ view: view }
 }
 
