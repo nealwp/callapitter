@@ -13,12 +13,14 @@ var hosts = []string{"http://localhost:8000", "https://jsonplaceholder.typicode.
 
 func NewHostDropdown() *HostDropdown {
 
+    title := "Host"
+
     view := tview.NewDropDown()
     view.SetOptions(hosts, nil)
     view.SetCurrentOption(0)
     view.SetFieldBackgroundColor(BG_COLOR)
     view.SetFieldTextColor(BG_COLOR)
-    view.SetTitle("Host [C-h]")
+    view.SetTitle(title)
     view.SetTitleAlign(tview.AlignLeft)
     view.SetBackgroundColor(BG_COLOR)
     view.SetBorder(true)

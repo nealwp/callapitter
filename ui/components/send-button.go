@@ -10,7 +10,9 @@ type SendButton struct {
 }
 
 func NewSendButton() *SendButton {
-    view := tview.NewButton("Send [⏎]")
+    label := "Send"
+
+    view := tview.NewButton(label)
     view.SetBorder(true)
     view.SetStyle(tcell.StyleDefault.Background(BG_COLOR))
     view.SetLabelColorActivated(tcell.ColorDarkBlue)

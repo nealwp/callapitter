@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"github.com/nealwp/callapitter/ui/components"
 	"github.com/rivo/tview"
 )
