@@ -7,6 +7,15 @@ import (
 
 type AppLayout struct {
     view *tview.Flex
+    statusBar *ui.StatusBar
+    methodDropdown *ui.MethodDropdown
+    hostDropdown *ui.HostDropdown
+    urlInput *ui.UrlInput
+    headersTable *ui.HeadersTable
+    reqBody *ui.RequestBodyArea
+    reqList *ui.RequestList
+    resBox *ui.ResponseView
+    sendBtn *ui.SendButton
 }
 
 var defaultHeaders = []ui.Header {
@@ -23,41 +32,53 @@ var requests = []ui.HttpRequest {
 
 func NewAppLayout() *AppLayout {
 
-    statusBar := ui.NewStatusBar() 
-    methodDropdown := ui.NewMethodDropdown()
-    hostDropdown := ui.NewHostDropdown()
-    urlInput := ui.NewUrlInput() 
-    headersTable := ui.NewHeadersTable() 
-    reqBody := ui.NewRequestBodyArea()
+    l := &AppLayout{
+        view: tview.NewFlex(),
+        statusBar: ui.NewStatusBar(),
+        methodDropdown: ui.NewMethodDropdown(),
+        hostDropdown: ui.NewHostDropdown(),
+        urlInput: ui.NewUrlInput(),
+        headersTable: ui.NewHeadersTable(),
+        reqBody: ui.NewRequestBodyArea(),
+        reqList: ui.NewRequestList(),
+        resBox: ui.NewResponseView(),
+        sendBtn: ui.NewSendButton(),
+    }
+    
+    l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+        selected := requests[index]
+        l.methodDropdown.SetCurrentOption(selected.Method)
+        l.urlInput.SetText(selected.Endpoint)
+        l.headersTable.DisplayHeaders(selected.Headers)
+        l.reqBody.SetText(selected.Body)
+        l.resBox.SetContent(selected.LastResponse)
+    })
 
-    reqList := ui.NewRequestList() 
-    reqList.SetContent(requests)
-
-    resBox := ui.NewResponseView() 
-    sendBtn := ui.NewSendButton() 
-
-    view := tview.NewFlex().
-    AddItem(reqList.GetPrimitive(), 50, 1, true).
-    AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-        AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-            AddItem(methodDropdown.GetPrimitive(), 15, 1, false).
-            AddItem(hostDropdown.GetPrimitive(), 45, 1, false).
-            AddItem(urlInput.GetPrimitive(), 0, 1, false).
-            AddItem(sendBtn.GetPrimitive(), 12, 1, false),
-            3, 1, false).
-        AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-            AddItem(reqBody.GetPrimitive(), 0, 5, false).
-            AddItem(headersTable.GetPrimitive(), 0, 5, false),
-            0, 5, false).
-        AddItem(resBox.GetPrimitive(), 0, 5, false).
-        AddItem(statusBar.GetPrimitive(), 3, 1, false), 
-        0, 2, false,
-    )
-
-    return &AppLayout{view: view}
+    return l
 }
 
 func (l *AppLayout) GetPrimitive() tview.Primitive {
+
+    l.view.AddItem(l.reqList.GetPrimitive(), 50, 1, true).
+        AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+            AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
+                AddItem(l.methodDropdown.GetPrimitive(), 15, 1, false).
+                AddItem(l.hostDropdown.GetPrimitive(), 45, 1, false).
+                AddItem(l.urlInput.GetPrimitive(), 0, 1, false).
+                AddItem(l.sendBtn.GetPrimitive(), 12, 1, false),
+                3, 1, false).
+            AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
+                AddItem(l.reqBody.GetPrimitive(), 0, 5, false).
+                AddItem(l.headersTable.GetPrimitive(), 0, 5, false),
+                0, 5, false).
+            AddItem(l.resBox.GetPrimitive(), 0, 5, false).
+            AddItem(l.statusBar.GetPrimitive(), 3, 1, false), 
+            0, 2, false,
+        )
+
+    // these will come from db
+    l.reqList.SetContent(requests)
+
     return l.view
 }
 
