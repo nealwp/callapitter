@@ -1,9 +1,23 @@
 package ui
 
 import (
-    "github.com/rivo/tview"
-    "github.com/nealwp/callapitter/ui/components"
+	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/ui/components"
+	"github.com/rivo/tview"
 )
+
+
+var defaultHeaders = []ui.Header {
+    {Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
+}
+
+var requests = []ui.HttpRequest {
+    {Method: "GET", Endpoint: "/api/test/hello", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/api/test/health", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "POST", Endpoint: "/api/test/user", Headers: defaultHeaders, Body: "{\"name\": \"foo\", \"age\": 99}", LastResponse: ""},
+    {Method: "GET", Endpoint: "/api/test/users", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/api/test/some/really/long/address", Headers: defaultHeaders, Body: "", LastResponse: ""},
+}
 
 type AppLayout struct {
     view *tview.Flex
@@ -16,18 +30,6 @@ type AppLayout struct {
     reqList *ui.RequestList
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
-}
-
-var defaultHeaders = []ui.Header {
-    {Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
-}
-
-var requests = []ui.HttpRequest {
-    {Method: "GET", Endpoint: "/api/test/hello", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/health", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "POST", Endpoint: "/api/test/user", Headers: defaultHeaders, Body: "{\"name\": \"foo\", \"age\": 99}", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/users", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/some/really/long/address", Headers: defaultHeaders, Body: "", LastResponse: ""},
 }
 
 func NewAppLayout() *AppLayout {
@@ -82,4 +84,15 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
     return l.view
 }
 
-
+func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
+    focusables := []tview.Primitive{
+        l.reqList.GetPrimitive(), 
+        l.methodDropdown.GetPrimitive(), 
+        l.hostDropdown.GetPrimitive(),
+        l.urlInput.GetPrimitive(),
+        l.reqBody.GetPrimitive(),
+        l.headersTable.GetPrimitive(),
+        l.resBox.GetPrimitive(),
+    }
+    return focusables
+}
