@@ -23,7 +23,7 @@ func NewRequestList() *RequestList {
     view.ShowSecondaryText(false)
     view.SetBorder(true)
     view.SetBackgroundColor(BG_COLOR)
-    view.SetTitle("Requests [C-r]")
+    view.SetTitle("Requests")
     view.SetTitleAlign(tview.AlignLeft)
     view.SetBorderPadding(1,1,1,1)
 

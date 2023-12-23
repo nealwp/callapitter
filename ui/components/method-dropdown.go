@@ -18,7 +18,7 @@ func NewMethodDropdown() *MethodDropdown {
     view.SetCurrentOption(0)
     view.SetFieldBackgroundColor(BG_COLOR)
     view.SetFieldTextColor(BG_COLOR)
-    view.SetTitle("Method [C-e]")
+    view.SetTitle("Method")
     view.SetTitleAlign(tview.AlignLeft)
     view.SetBackgroundColor(BG_COLOR)
     view.SetBorder(true)

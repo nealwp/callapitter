@@ -60,3 +60,5 @@ func NewAppLayout() *AppLayout {
 func (l *AppLayout) GetPrimitive() tview.Primitive {
     return l.view
 }
+
+
