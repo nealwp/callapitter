@@ -117,6 +117,7 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
             }
             l.resBox.SetContent(res.Body)
             l.statusBar.SetStatus(res.Status)
+            requests[index].LastResponse = res.Body
         }
         return event
     })
