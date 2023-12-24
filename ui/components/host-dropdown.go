@@ -9,7 +9,7 @@ type HostDropdown struct {
     view *tview.DropDown
 }
 
-var hosts = []string{"http://localhost:8000", "https://jsonplaceholder.typicode.com"}
+var hosts = []string{"https://jsonplaceholder.typicode.com"}
 
 func NewHostDropdown() *HostDropdown {
 
@@ -53,4 +53,9 @@ func NewHostDropdown() *HostDropdown {
 
 func (h *HostDropdown) GetPrimitive() tview.Primitive {
     return h.view
+}
+
+func (h *HostDropdown) GetSelectedHost() string {
+    _, host := h.view.GetCurrentOption()
+    return host
 }

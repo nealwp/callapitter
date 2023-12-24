@@ -1,8 +1,14 @@
 package ui
 
 import (
+	"io"
+	"net/http"
+	"strings"
+
 	"github.com/nealwp/callapitter/ui/components"
+    "github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+
 )
 
 
@@ -11,11 +17,14 @@ var defaultHeaders = []ui.Header {
 }
 
 var requests = []ui.HttpRequest {
-    {Method: "GET", Endpoint: "/api/test/hello", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/health", Headers: defaultHeaders, Body: "", LastResponse: ""},
     {Method: "POST", Endpoint: "/api/test/user", Headers: defaultHeaders, Body: "{\"name\": \"foo\", \"age\": 99}", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/users", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/api/test/some/really/long/address", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/users/6", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/posts/3", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/albums/12", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/todos/2", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/posts/4/comments", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/albums", Headers: defaultHeaders, Body: "", LastResponse: ""},
+    {Method: "GET", Endpoint: "/albums/400", Headers: defaultHeaders, Body: "", LastResponse: ""},
 }
 
 type AppLayout struct {
@@ -80,6 +89,38 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
     // these will come from db
     l.reqList.SetContent(requests)
 
+    l.reqList.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune){
+        host := l.hostDropdown.GetSelectedHost()
+        res, err := sendRequest(requests[index], host)    
+        if err != nil {
+            panic(err)
+        }
+        l.resBox.SetContent(res.Body)
+        l.statusBar.SetStatus(res.Status)
+    })
+
+    l.reqList.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+        index := l.reqList.GetSelectedRequest()
+        if event.Key() == tcell.KeyRune {
+            switch event.Rune() {
+            case 'j':
+                l.reqList.SetSelectedRequest(index+1)
+            case 'k':
+                l.reqList.SetSelectedRequest(index-1)
+            }
+            return event
+        } else if event.Key() == tcell.KeyEnter {
+            host := l.hostDropdown.GetSelectedHost()
+            res, err := sendRequest(requests[index], host)    
+            if err != nil {
+                panic(err)
+            }
+            l.resBox.SetContent(res.Body)
+            l.statusBar.SetStatus(res.Status)
+        }
+        return event
+    })
+
     return l.view
 }
 
@@ -94,4 +135,40 @@ func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
         l.resBox.GetPrimitive(),
     }
     return focusables
+}
+
+type HttpResponse struct {
+    Body string
+    Status string 
+}
+
+func sendRequest(req ui.HttpRequest, host string) (HttpResponse, error) {
+    client := &http.Client{}
+
+    url := host + req.Endpoint
+
+    request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body))
+    if err != nil {
+        panic(err)
+    }
+
+    // do header things later
+
+    response, err := client.Do(request)
+    if err != nil {
+        panic(err)
+    }
+
+    defer response.Body.Close()
+    
+    bodyBytes, err := io.ReadAll(response.Body)
+    if err != nil {
+        return HttpResponse{}, err
+    }
+
+    body := string(bodyBytes)
+    status := response.Status
+
+
+    return HttpResponse{Body: body, Status: status}, nil
 }

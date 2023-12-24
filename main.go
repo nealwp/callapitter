@@ -31,9 +31,6 @@ func main() {
             return nil
 		case tcell.KeyCtrlC:
 			return nil
-		case tcell.KeyEnter:
-			//sendRequest()
-			return nil
 		case tcell.KeyRune:
 			if event.Rune() == 'q' {
 				app.Stop()
