@@ -1,12 +1,20 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/db"
 	"github.com/nealwp/callapitter/ui"
 	"github.com/rivo/tview"
 )
 
 func main() {
+    
+    err := db.InitializeDB("./callapitter.db")
+    if err != nil {
+        log.Panicf("Error initializing database: %v" , err)
+    }
 
 	app := tview.NewApplication()
 	layout := ui.NewAppLayout()

@@ -5,6 +5,7 @@ import (
     "github.com/gdamore/tcell/v2"
 )
 
+// TODO: what if we had no button instead...
 type SendButton struct {
     view *tview.Button
 }
