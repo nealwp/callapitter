@@ -1,30 +1,20 @@
 package ui
 
 import (
+	"database/sql"
 	"io"
 	"net/http"
 	"strings"
 
+	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/store"
 	"github.com/nealwp/callapitter/ui/components"
-    "github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-
 )
 
 
 var defaultHeaders = []ui.Header {
     {Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
-}
-
-var requests = []ui.HttpRequest {
-    {Method: "POST", Endpoint: "/api/test/user", Headers: defaultHeaders, Body: "{\"name\": \"foo\", \"age\": 99}", LastResponse: ""},
-    {Method: "GET", Endpoint: "/users/6", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/posts/3", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/albums/12", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/todos/2", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/posts/4/comments", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/albums", Headers: defaultHeaders, Body: "", LastResponse: ""},
-    {Method: "GET", Endpoint: "/albums/400", Headers: defaultHeaders, Body: "", LastResponse: ""},
 }
 
 type AppLayout struct {
@@ -38,9 +28,11 @@ type AppLayout struct {
     reqList *ui.RequestList
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
+
+    requests []store.Request
 }
 
-func NewAppLayout() *AppLayout {
+func NewAppLayout(requests []store.Request) *AppLayout {
 
     l := &AppLayout{
         view: tview.NewFlex(),
@@ -53,15 +45,18 @@ func NewAppLayout() *AppLayout {
         reqList: ui.NewRequestList(),
         resBox: ui.NewResponseView(),
         sendBtn: ui.NewSendButton(),
+        
+        requests: requests,
+
     }
     
     l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
-        selected := requests[index]
+        selected := l.requests[index]
         l.methodDropdown.SetCurrentOption(selected.Method)
         l.urlInput.SetText(selected.Endpoint)
-        l.headersTable.DisplayHeaders(selected.Headers)
-        l.reqBody.SetText(selected.Body)
-        l.resBox.SetContent(selected.LastResponse)
+        l.headersTable.DisplayHeaders(defaultHeaders)
+        l.reqBody.SetText(selected.Body.String)
+        l.resBox.SetContent(selected.LastResponse.String)
     })
 
     return l
@@ -86,12 +81,11 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
             0, 2, false,
         )
 
-    // these will come from db
-    l.reqList.SetContent(requests)
+    l.reqList.SetContent(l.requests)
 
     l.reqList.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune){
         host := l.hostDropdown.GetSelectedHost()
-        res, err := sendRequest(requests[index], host)    
+        res, err := sendRequest(l.requests[index], host)    
         if err != nil {
             panic(err)
         }
@@ -111,13 +105,14 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
             return event
         } else if event.Key() == tcell.KeyEnter {
             host := l.hostDropdown.GetSelectedHost()
-            res, err := sendRequest(requests[index], host)    
+            res, err := sendRequest(l.requests[index], host)    
             if err != nil {
                 panic(err)
             }
             l.resBox.SetContent(res.Body)
             l.statusBar.SetStatus(res.Status)
-            requests[index].LastResponse = res.Body
+            l.requests[index].LastResponse = sql.NullString{String: res.Body, Valid: true}
+
         }
         return event
     })
@@ -143,12 +138,12 @@ type HttpResponse struct {
     Status string 
 }
 
-func sendRequest(req ui.HttpRequest, host string) (HttpResponse, error) {
+func sendRequest(req store.Request, host string) (HttpResponse, error) {
     client := &http.Client{}
 
     url := host + req.Endpoint
 
-    request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body))
+    request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body.String))
     if err != nil {
         panic(err)
     }

@@ -4,20 +4,31 @@ import (
 	"log"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/nealwp/callapitter/db"
+    "github.com/nealwp/callapitter/store" 
 	"github.com/nealwp/callapitter/ui"
 	"github.com/rivo/tview"
 )
 
 func main() {
     
-    err := db.InitializeDB("./callapitter.db")
+    db, err := store.InitializeStore("./callapitter.db")
+
     if err != nil {
         log.Panicf("Error initializing database: %v" , err)
     }
 
+    reqDb := store.NewRequestStore(db)
+    //hosts := store.NewHostStore(db)
+
 	app := tview.NewApplication()
-	layout := ui.NewAppLayout()
+
+    requests, err := reqDb.GetRequests() 
+
+    if err != nil {
+        log.Panicf(err.Error())
+    }
+
+	layout := ui.NewAppLayout(requests)
 
     focusables := layout.GetFocusableComponents()
 

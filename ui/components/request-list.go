@@ -1,18 +1,12 @@
 package ui
 
 import (
-    "fmt"
-    "github.com/rivo/tview"
-    "github.com/gdamore/tcell/v2"
-)
+	"fmt"
 
-type HttpRequest struct {
-    Method string
-    Endpoint string
-    Headers []Header
-    Body string
-    LastResponse string
-}
+	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/store"
+	"github.com/rivo/tview"
+)
 
 type RequestList struct {
     view *tview.List
@@ -37,7 +31,7 @@ func (r *RequestList) GetPrimitive() tview.Primitive {
     return r.view
 }
 
-func (r *RequestList) SetContent(requests []HttpRequest) {
+func (r *RequestList) SetContent(requests []store.Request) {
     for _, req := range requests {
         r.view.AddItem(fmt.Sprintf("%-4s", req.Method) + "  " + req.Endpoint, "", 0, nil)
     }
