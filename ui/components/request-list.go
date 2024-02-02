@@ -8,51 +8,52 @@ import (
 	"github.com/rivo/tview"
 )
 
+
 type RequestList struct {
-    view *tview.List
+	view *tview.List
 }
 
 func NewRequestList() *RequestList {
 
-    title := "Requests"
+	title := "Requests"
 
-    view := tview.NewList()
-    view.ShowSecondaryText(false)
-    view.SetBorder(true)
-    view.SetBackgroundColor(BG_COLOR)
-    view.SetTitle(title)
-    view.SetTitleAlign(tview.AlignLeft)
-    view.SetBorderPadding(1,1,1,1)
+	view := tview.NewList()
+	view.ShowSecondaryText(false)
+	view.SetBorder(true)
+	view.SetBackgroundColor(BG_COLOR)
+	view.SetTitle(title)
+	view.SetTitleAlign(tview.AlignLeft)
+	view.SetBorderPadding(1, 1, 1, 1)
 
-    return &RequestList{ view: view }
+	return &RequestList{view: view}
 }
 
 func (r *RequestList) GetPrimitive() tview.Primitive {
-    return r.view
+	return r.view
 }
 
 func (r *RequestList) SetContent(requests []store.Request) {
-    for _, req := range requests {
-        r.view.AddItem(fmt.Sprintf("%-4s", req.Method) + "  " + req.Endpoint, "", 0, nil)
-    }
+	for _, req := range requests {
+		r.view.AddItem(fmt.Sprintf("%-4s", req.Method)+"  "+req.Endpoint, "", 0, nil)
+	}
 }
 
 func (r *RequestList) SetChangedFunc(f func(index int, mainText, secondaryText string, shortcut rune)) {
-    r.view.SetChangedFunc(f)
+	r.view.SetChangedFunc(f)
 }
 
 func (r *RequestList) SetSelectedFunc(f func(index int, mainText, secondaryText string, shortcut rune)) {
-    r.view.SetSelectedFunc(f)
+	r.view.SetSelectedFunc(f)
 }
 
 func (r *RequestList) SetInputCapture(f func(event *tcell.EventKey) *tcell.EventKey) {
-    r.view.SetInputCapture(f)
+	r.view.SetInputCapture(f)
 }
 
 func (r *RequestList) GetSelectedRequest() int {
-    return r.view.GetCurrentItem()
+	return r.view.GetCurrentItem()
 }
 
 func (r *RequestList) SetSelectedRequest(index int) {
-    r.view.SetCurrentItem(index)
+	r.view.SetCurrentItem(index)
 }
