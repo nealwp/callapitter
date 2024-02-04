@@ -7,10 +7,18 @@ import (
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/nealwp/callapitter/store"
+	"github.com/nealwp/callapitter/model"
 	"github.com/nealwp/callapitter/ui/components"
 	"github.com/rivo/tview"
 )
+
+type AppController interface {
+    SendRequest(req model.Request)
+    CreateRequest(req model.Request) error
+    DeleteRequest(req model.Request) error
+    GetRequests() ([]model.Request, error)
+    UpdateRequest(model.Request)
+}
 
 var defaultHeaders = []ui.Header{
 	{Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
@@ -27,11 +35,12 @@ type AppLayout struct {
     reqList *ui.RequestList
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
+    requests []model.Request
 
-    requests []store.Request
+    controller AppController
 }
 
-func NewAppLayout(requests []store.Request) *AppLayout {
+func NewAppLayout() *AppLayout {
 
     l := &AppLayout{
         view: tview.NewFlex(),
@@ -44,27 +53,16 @@ func NewAppLayout(requests []store.Request) *AppLayout {
         reqList: ui.NewRequestList(),
         resBox: ui.NewResponseView(),
         sendBtn: ui.NewSendButton(),
-        
-        requests: requests,
 
     }
     
-    l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
-        selected := l.requests[index]
-        l.methodDropdown.SetCurrentOption(selected.Method)
-        l.urlInput.SetText(selected.Endpoint)
-        l.headersTable.DisplayHeaders(defaultHeaders)
-        l.reqBody.SetText(selected.Body.String)
-        l.resBox.SetContent(selected.LastResponse.String)
-    })
-
 	l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
-		selected := requests[index]
-		l.methodDropdown.SetCurrentOption(selected.Method)
+		selected := l.requests[index]
+		l.methodDropdown.SetCurrentOption(selected)
 		l.urlInput.SetText(selected.Endpoint)
-		l.headersTable.DisplayHeaders(selected.Headers)
-		l.reqBody.SetText(selected.Body)
-		l.resBox.SetContent(selected.LastResponse)
+		l.headersTable.DisplayHeaders(defaultHeaders)
+		l.reqBody.SetText(selected.Body.String)
+		l.resBox.SetContent(selected.LastResponse.String)
 	})
 
 	return l
@@ -89,26 +87,33 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
 			0, 2, false,
 		)
 
-    l.reqList.SetContent(l.requests)
+    requests, err := l.controller.GetRequests()
+    if err != nil {
+        l.statusBar.SetStatus(err.Error())
+    }
 
-    l.reqList.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune){
-        host := l.hostDropdown.GetSelectedHost()
-        res, err := sendRequest(l.requests[index], host)    
-        if err != nil {
-            panic(err)
-        }
-        l.resBox.SetContent(res.Body)
-        l.statusBar.SetStatus(res.Status)
-    })
+    l.requests = requests
+    l.reqList.SetContent(l.requests)
 
     l.reqList.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
         index := l.reqList.GetSelectedRequest()
         if event.Key() == tcell.KeyRune {
             switch event.Rune() {
-            case 'j':
+            case 'D':
+                err := l.controller.DeleteRequest(l.requests[index])
+                if err != nil {
+                    l.statusBar.SetStatus(err.Error())
+                }
+            case 'j': 
                 l.reqList.SetSelectedRequest(index+1)
             case 'k':
                 l.reqList.SetSelectedRequest(index-1)
+            case '%':
+                newRequest := model.Request{Method: "GET", Endpoint: "/"}
+                err := l.controller.CreateRequest(newRequest)
+                if err != nil {
+                    l.statusBar.SetStatus(err.Error())
+                }
             }
             return event
         } else if event.Key() == tcell.KeyEnter {
@@ -141,12 +146,22 @@ func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
 	return focusables
 }
 
+func (l *AppLayout) SetController(controller AppController) {
+    l.controller = controller
+    l.methodDropdown.OnChange(controller)
+}
+
+func (l *AppLayout) SetRequests(requests []model.Request) {
+    l.requests = requests
+    l.reqList.SetContent(l.requests)
+}
+
 type HttpResponse struct {
 	Body   string
 	Status string
 }
 
-func sendRequest(req store.Request, host string) (HttpResponse, error) {
+func sendRequest(req model.Request, host string) (HttpResponse, error) {
     client := &http.Client{}
 
 	url := host + req.Endpoint

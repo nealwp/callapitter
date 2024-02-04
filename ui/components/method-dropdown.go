@@ -2,11 +2,18 @@ package ui
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/model"
 	"github.com/rivo/tview"
 )
 
+type ChangeHandler interface {
+   UpdateRequest(req model.Request)
+}
+
 type MethodDropdown struct {
 	view *tview.DropDown
+    handler ChangeHandler
+    request model.Request
 }
 
 var methods = []string{"GET", "POST", "PUT", "DELETE"}
@@ -26,38 +33,55 @@ func NewMethodDropdown() *MethodDropdown {
 	view.SetBorder(true)
 	view.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
 
-	view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		currentOption, _ := view.GetCurrentOption()
-
-		if event.Key() == tcell.KeyRune {
-			switch event.Rune() {
-			case 'j':
-				nextOption := (currentOption + 1) % len(methods)
-				view.SetCurrentOption(nextOption)
-				return nil
-			case 'k':
-				prevOption := (currentOption - 1 + len(methods)) % len(methods)
-				view.SetCurrentOption(prevOption)
-				return nil
-			}
-		} else if event.Key() == tcell.KeyEnter {
-			// set it here
-			return nil
-		}
-
-		return event
-	})
-
-	return &MethodDropdown{view: view}
+    m := &MethodDropdown{view: view}
+    m.setKeyBindings()
+	return m 
 }
 
 func (m *MethodDropdown) GetPrimitive() tview.Primitive {
 	return m.view
 }
 
-func (m *MethodDropdown) SetCurrentOption(method string) {
-	index := findMethodIndex(method)
+func (m *MethodDropdown) OnChange(handler ChangeHandler) {
+   m.handler = handler 
+}
+
+func (m *MethodDropdown) SetCurrentOption(req model.Request) {
+    m.request = req
+	index := findMethodIndex(req.Method)
 	m.view.SetCurrentOption(index)
+}
+
+func (m *MethodDropdown) setKeyBindings() {
+
+    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+		index, _ := m.view.GetCurrentOption()
+
+		if event.Key() == tcell.KeyRune {
+			switch event.Rune() {
+			case 'j':
+				nextOption := (index + 1) % len(methods)
+				m.view.SetCurrentOption(nextOption)
+                m.setRequestMethod()
+				return nil
+			case 'k':
+				prevOption := (index - 1 + len(methods)) % len(methods)
+				m.view.SetCurrentOption(prevOption)
+                m.setRequestMethod()
+				return nil
+			}
+		} 
+
+		return event
+    }
+
+	m.view.SetInputCapture(keybinds)
+}
+
+func (m *MethodDropdown) setRequestMethod() {
+    index, _ := m.view.GetCurrentOption()
+    m.request.Method = methods[index] 
+    m.handler.UpdateRequest(m.request)
 }
 
 func findMethodIndex(method string) int {

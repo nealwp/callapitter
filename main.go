@@ -1,52 +1,37 @@
 package main
 
 import (
-	"log"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/nealwp/callapitter/store"
+	"github.com/nealwp/callapitter/controller"
+	"github.com/nealwp/callapitter/model"
 	"github.com/nealwp/callapitter/ui"
 	"github.com/rivo/tview"
 )
 
 func main() {
 
-	db, err := store.InitializeStore("./callapitter.db")
+	model := model.NewAppModel("./callapitter.db")
 
-	if err != nil {
-		log.Panicf("Error initializing database: %v", err)
-	}
+    controller := controller.NewAppController()
+    
+    app := tview.NewApplication()
 
-	reqStore := store.NewRequestStore(db)
-	//hosts := store.NewHostStore(db)
+    view := ui.NewAppLayout()
 
-	app := tview.NewApplication()
+    controller.SetView(view)
+    controller.SetModel(model)
+    view.SetController(controller)
 
-	requests, err := reqStore.GetRequests()
-
-	if err != nil {
-		log.Panicf(err.Error())
-	}
-
-	layout := ui.NewAppLayout(requests)
-
-	focusables := layout.GetFocusableComponents()
-
-	focusNext := func() {
-		currentFocus := app.GetFocus()
-		for i, component := range focusables {
-			if component == currentFocus {
-				nextIndex := (i + 1) % len(focusables)
-				app.SetFocus(focusables[nextIndex])
-				break
-			}
-		}
-	}
+    components := view.GetFocusableComponents()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyTab:
-			focusNext()
+			focusNext(app, components)
+			return nil
+		case tcell.KeyBacktab:
+			focusPrevious(app, components)
 			return nil
 		case tcell.KeyCtrlC:
 			return nil
@@ -59,9 +44,33 @@ func main() {
 	})
 
 	app.EnableMouse(true)
-	app.SetRoot(layout.GetPrimitive(), true)
+	app.SetRoot(view.GetPrimitive(), true)
 
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
+}
+
+func focusNext(app *tview.Application, components []tview.Primitive) {
+
+    currentFocus := app.GetFocus()
+    for i, component := range components {
+        if component == currentFocus {
+            nextIndex := (i + 1) % len(components)
+            app.SetFocus(components[nextIndex])
+            break
+        }
+    }
+}
+
+func focusPrevious(app *tview.Application, components []tview.Primitive) {
+
+    currentFocus := app.GetFocus()
+    for i, component := range components {
+        if component == currentFocus {
+            prevIndex := (i - 1 + len(components)) % len(components)
+            app.SetFocus(components[prevIndex])
+            break
+        }
+    }
 }

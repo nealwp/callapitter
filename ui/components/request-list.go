@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/nealwp/callapitter/store"
+	"github.com/nealwp/callapitter/model"
 	"github.com/rivo/tview"
 )
 
@@ -32,7 +32,8 @@ func (r *RequestList) GetPrimitive() tview.Primitive {
 	return r.view
 }
 
-func (r *RequestList) SetContent(requests []store.Request) {
+func (r *RequestList) SetContent(requests []model.Request) {
+    r.view.Clear()
 	for _, req := range requests {
 		r.view.AddItem(fmt.Sprintf("%-4s", req.Method)+"  "+req.Endpoint, "", 0, nil)
 	}

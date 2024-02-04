@@ -1,13 +1,31 @@
-package store
+package model
 
 import (
 	"database/sql"
-	"os"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func InitializeStore(path string) (*sql.DB, error) {
+type AppModel struct {
+    Request *RequestStore
+    Host *HostStore
+}
+
+func NewAppModel(path string) *AppModel {
+    db, err := initializeStore(path) 
+
+	if err != nil {
+		log.Panicf("Error initializing database: %v", err)
+	}
+
+    request := NewRequestStore(db)
+    host := NewHostStore(db)
+
+    return &AppModel{Request: request, Host: host}
+}
+
+func initializeStore(path string) (*sql.DB, error) {
 
     db, err := sql.Open("sqlite3", path)
 
@@ -28,13 +46,4 @@ func InitializeStore(path string) (*sql.DB, error) {
     }
 
     return db, nil
-}
-
-func readSqlFile(path string) (string, error) {
-    content, err := os.ReadFile(path)
-    if err != nil {
-        return "", err
-    }
-
-    return string(content), nil
 }
