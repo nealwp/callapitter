@@ -59,7 +59,7 @@ func NewAppLayout() *AppLayout {
 	l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
 		selected := l.requests[index]
 		l.methodDropdown.SetCurrentOption(selected)
-		l.urlInput.SetText(selected.Endpoint)
+		l.urlInput.SetText(selected)
 		l.headersTable.DisplayHeaders(defaultHeaders)
 		l.reqBody.SetText(selected.Body.String)
 		l.resBox.SetContent(selected.LastResponse.String)
@@ -149,6 +149,7 @@ func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
 func (l *AppLayout) SetController(controller AppController) {
     l.controller = controller
     l.methodDropdown.OnChange(controller)
+    l.urlInput.OnChange(controller)
 }
 
 func (l *AppLayout) SetRequests(requests []model.Request) {

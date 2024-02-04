@@ -2,11 +2,14 @@ package ui
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/model"
 	"github.com/rivo/tview"
 )
 
 type UrlInput struct {
 	view *tview.InputField
+    handler ChangeHandler
+    request model.Request
 }
 
 func NewUrlInput() *UrlInput {
@@ -20,19 +23,38 @@ func NewUrlInput() *UrlInput {
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
 
-	urlInputCapture := func(event *tcell.EventKey) *tcell.EventKey {
-		return event
-	}
+    u := &UrlInput{view: view}
+    u.setDoneFunc()
+    u.setInputCapture()
 
-	view.SetInputCapture(urlInputCapture)
-
-	return &UrlInput{view: view}
+	return u 
 }
 
 func (u *UrlInput) GetPrimitive() tview.Primitive {
 	return u.view
 }
 
-func (u *UrlInput) SetText(text string) {
-	u.view.SetText(text)
+func (u *UrlInput) SetText(req model.Request) {
+    u.request = req
+	u.view.SetText(req.Endpoint)
 }
+
+func (u *UrlInput) OnChange(handler ChangeHandler) {
+    u.handler = handler
+}
+
+func (u *UrlInput) setInputCapture() {
+    u.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+        return event
+    })
+}
+
+func (u *UrlInput) setDoneFunc() {
+    u.view.SetDoneFunc(func(key tcell.Key){
+        if key == tcell.KeyEnter {
+            u.request.Endpoint = u.view.GetText()
+            u.handler.UpdateRequest(u.request)
+        }
+    })
+}
+
