@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"github.com/gdamore/tcell/v2"
 	"github.com/nealwp/callapitter/controller"
 	"github.com/nealwp/callapitter/model"
@@ -13,17 +12,17 @@ func main() {
 
 	model := model.NewAppModel("./callapitter.db")
 
-    controller := controller.NewAppController()
-    
-    app := tview.NewApplication()
+	controller := controller.NewAppController()
 
-    view := ui.NewAppView()
+	app := tview.NewApplication()
 
-    controller.SetView(view)
-    controller.SetModel(model)
-    view.SetController(controller)
+	view := ui.NewAppView()
 
-    components := view.GetFocusableComponents()
+	controller.SetView(view)
+	controller.SetModel(model)
+	view.SetController(controller)
+
+	components := view.GetFocusableComponents()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
@@ -52,24 +51,24 @@ func main() {
 
 func focusNext(app *tview.Application, components []tview.Primitive) {
 
-    currentFocus := app.GetFocus()
-    for i, component := range components {
-        if component == currentFocus {
-            nextIndex := (i + 1) % len(components)
-            app.SetFocus(components[nextIndex])
-            break
-        }
-    }
+	currentFocus := app.GetFocus()
+	for i, component := range components {
+		if component == currentFocus {
+			nextIndex := (i + 1) % len(components)
+			app.SetFocus(components[nextIndex])
+			break
+		}
+	}
 }
 
 func focusPrevious(app *tview.Application, components []tview.Primitive) {
 
-    currentFocus := app.GetFocus()
-    for i, component := range components {
-        if component == currentFocus {
-            prevIndex := (i - 1 + len(components)) % len(components)
-            app.SetFocus(components[prevIndex])
-            break
-        }
-    }
+	currentFocus := app.GetFocus()
+	for i, component := range components {
+		if component == currentFocus {
+			prevIndex := (i - 1 + len(components)) % len(components)
+			app.SetFocus(components[prevIndex])
+			break
+		}
+	}
 }
