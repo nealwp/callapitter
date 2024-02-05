@@ -1,30 +1,26 @@
 package ui
 
 import (
-	"database/sql"
-	"io"
-	"net/http"
-	"strings"
-
-	"github.com/gdamore/tcell/v2"
 	"github.com/nealwp/callapitter/model"
 	"github.com/nealwp/callapitter/ui/components"
 	"github.com/rivo/tview"
 )
 
 type AppController interface {
-    SendRequest(req model.Request)
-    CreateRequest(req model.Request) error
-    DeleteRequest(req model.Request) error
+    SendRequest(index int)
+    CreateRequest()
+    DeleteRequest(index int)
     GetRequests() ([]model.Request, error)
     UpdateRequest(model.Request)
+    GetHosts() ([]model.Host, error)
+    SelectRequest(index int)
 }
 
 var defaultHeaders = []ui.Header{
 	{Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
 }
 
-type AppLayout struct {
+type AppView struct {
     view *tview.Flex
     statusBar *ui.StatusBar
     methodDropdown *ui.MethodDropdown
@@ -35,14 +31,16 @@ type AppLayout struct {
     reqList *ui.RequestList
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
+
     requests []model.Request
+    hosts []model.Host
 
     controller AppController
 }
 
-func NewAppLayout() *AppLayout {
+func NewAppLayout() *AppView {
 
-    l := &AppLayout{
+    l := &AppView{
         view: tview.NewFlex(),
         statusBar: ui.NewStatusBar(),
         methodDropdown: ui.NewMethodDropdown(),
@@ -68,7 +66,7 @@ func NewAppLayout() *AppLayout {
 	return l
 }
 
-func (l *AppLayout) GetPrimitive() tview.Primitive {
+func (l *AppView) GetPrimitive() tview.Primitive {
 
 	l.view.AddItem(l.reqList.GetPrimitive(), 50, 1, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
@@ -87,6 +85,13 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
 			0, 2, false,
 		)
 
+    hosts, err := l.controller.GetHosts()
+    if err != nil {
+        l.statusBar.SetStatus(err.Error())
+    }
+    l.hosts = hosts
+    l.hostDropdown.SetHosts(l.hosts)
+
     requests, err := l.controller.GetRequests()
     if err != nil {
         l.statusBar.SetStatus(err.Error())
@@ -95,45 +100,10 @@ func (l *AppLayout) GetPrimitive() tview.Primitive {
     l.requests = requests
     l.reqList.SetContent(l.requests)
 
-    l.reqList.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        index := l.reqList.GetSelectedRequest()
-        if event.Key() == tcell.KeyRune {
-            switch event.Rune() {
-            case 'D':
-                err := l.controller.DeleteRequest(l.requests[index])
-                if err != nil {
-                    l.statusBar.SetStatus(err.Error())
-                }
-            case 'j': 
-                l.reqList.SetSelectedRequest(index+1)
-            case 'k':
-                l.reqList.SetSelectedRequest(index-1)
-            case '%':
-                newRequest := model.Request{Method: "GET", Endpoint: "/"}
-                err := l.controller.CreateRequest(newRequest)
-                if err != nil {
-                    l.statusBar.SetStatus(err.Error())
-                }
-            }
-            return event
-        } else if event.Key() == tcell.KeyEnter {
-            host := l.hostDropdown.GetSelectedHost()
-            res, err := sendRequest(l.requests[index], host)    
-            if err != nil {
-                panic(err)
-            }
-            l.resBox.SetContent(res.Body)
-            l.statusBar.SetStatus(res.Status)
-            l.requests[index].LastResponse = sql.NullString{String: res.Body, Valid: true}
-
-        }
-        return event
-    })
-
 	return l.view
 }
 
-func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
+func (l *AppView) GetFocusableComponents() []tview.Primitive {
 	focusables := []tview.Primitive{
 		l.reqList.GetPrimitive(),
 		l.methodDropdown.GetPrimitive(),
@@ -146,48 +116,35 @@ func (l *AppLayout) GetFocusableComponents() []tview.Primitive {
 	return focusables
 }
 
-func (l *AppLayout) SetController(controller AppController) {
+func (l *AppView) SetController(controller AppController) {
     l.controller = controller
     l.methodDropdown.OnChange(controller)
     l.urlInput.OnChange(controller)
+    l.reqList.SetHandler(controller)
 }
 
-func (l *AppLayout) SetRequests(requests []model.Request) {
+func (v *AppView) SetStatus(status string) {
+    v.statusBar.SetStatus(status)
+}
+
+func (l *AppView) SetRequests(requests []model.Request) {
     l.requests = requests
     l.reqList.SetContent(l.requests)
 }
 
-type HttpResponse struct {
-	Body   string
-	Status string
+func (l *AppView) SetHosts(hosts []model.Host) {
+    l.hosts = hosts
+    l.hostDropdown.SetHosts(l.hosts)
 }
 
-func sendRequest(req model.Request, host string) (HttpResponse, error) {
-    client := &http.Client{}
+func (v *AppView) SetResponse(body string) {
+    v.resBox.SetContent(body)
+}
 
-	url := host + req.Endpoint
+func (v *AppView) SetSelectedRequest(index int) {
+    v.reqList.SetSelectedRequest(index)
+}
 
-    request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body.String))
-    if err != nil {
-        panic(err)
-    }
-
-	// do header things later
-
-	response, err := client.Do(request)
-	if err != nil {
-		panic(err)
-	}
-
-	defer response.Body.Close()
-
-	bodyBytes, err := io.ReadAll(response.Body)
-	if err != nil {
-		return HttpResponse{}, err
-	}
-
-	body := string(bodyBytes)
-	status := response.Status
-
-	return HttpResponse{Body: body, Status: status}, nil
+func (v *AppView) GetSelectedHost() string {
+    return v.hostDropdown.GetSelectedHost()
 }

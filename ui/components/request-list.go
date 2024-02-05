@@ -8,9 +8,16 @@ import (
 	"github.com/rivo/tview"
 )
 
+type Handler interface {
+    DeleteRequest(index int)
+    SelectRequest(index int)
+    CreateRequest()
+    SendRequest(index int)
+}
 
 type RequestList struct {
 	view *tview.List
+    handler Handler
 }
 
 func NewRequestList() *RequestList {
@@ -25,11 +32,17 @@ func NewRequestList() *RequestList {
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetBorderPadding(1, 1, 1, 1)
 
-	return &RequestList{view: view}
+    r := &RequestList{view: view}
+    r.setKeybindings()
+	return r 
 }
 
 func (r *RequestList) GetPrimitive() tview.Primitive {
 	return r.view
+}
+
+func (r *RequestList) SetHandler(handler Handler) {
+    r.handler = handler
 }
 
 func (r *RequestList) SetContent(requests []model.Request) {
@@ -57,4 +70,29 @@ func (r *RequestList) GetSelectedRequest() int {
 
 func (r *RequestList) SetSelectedRequest(index int) {
 	r.view.SetCurrentItem(index)
+}
+
+func (r *RequestList) setKeybindings() {
+
+    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+        index := r.view.GetCurrentItem()
+        if event.Key() == tcell.KeyRune {
+            switch event.Rune() {
+            case 'D':
+                r.handler.DeleteRequest(index)
+            case 'j': 
+                r.handler.SelectRequest(index+1)
+            case 'k':
+                r.handler.SelectRequest(index-1)
+            case '%':
+                r.handler.CreateRequest()
+            }
+            return event
+        } else if event.Key() == tcell.KeyEnter {
+            r.handler.SendRequest(index)
+        }
+        return event
+    }
+
+    r.SetInputCapture(keybinds)
 }

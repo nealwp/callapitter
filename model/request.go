@@ -12,6 +12,7 @@ type Request struct {
 
 type RequestStore struct {
     DB *sql.DB
+    requests []Request
 }
 
 func NewRequestStore(db *sql.DB) *RequestStore {
@@ -19,7 +20,6 @@ func NewRequestStore(db *sql.DB) *RequestStore {
 }
 
 func (store *RequestStore) GetRequests() ([]Request, error) {
-    var requests []Request
 
     rows, err := store.DB.Query("SELECT id, method, endpoint, body, last_response FROM request;")
 
@@ -29,19 +29,25 @@ func (store *RequestStore) GetRequests() ([]Request, error) {
 
     defer rows.Close()
 
+    store.requests = nil
+
     for rows.Next() {
         var req Request 
         if err := rows.Scan(&req.Id, &req.Method, &req.Endpoint, &req.Body, &req.LastResponse); err != nil {
             return nil, err
         }
-        requests = append(requests, req)
+        store.requests = append(store.requests, req)
     }
 
     if err := rows.Err(); err != nil {
         return nil, err
     }
 
-    return requests, nil
+    return store.requests, nil
+}
+
+func (s *RequestStore) GetRequest(index int) Request {
+    return s.requests[index]
 }
 
 func (store *RequestStore) InsertRequest(r Request) error {
@@ -60,14 +66,19 @@ func (store *RequestStore) InsertRequest(r Request) error {
     return nil
 }
 
-func (store *RequestStore) DeleteRequest(r Request) error {
+func (store *RequestStore) DeleteRequest(index int) error {
+
     stmt, err := store.DB.Prepare("DELETE FROM request WHERE id = ?;")
+
     if err != nil {
         return err
     }
-    defer stmt.Close()
 
-    _, err = stmt.Exec(r.Id)
+    defer stmt.Close()
+    
+    req := store.requests[index]
+
+    _, err = stmt.Exec(req.Id)
 
     if err != nil {
         return err

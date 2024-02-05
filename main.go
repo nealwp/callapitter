@@ -43,7 +43,6 @@ func main() {
 		return event
 	})
 
-	app.EnableMouse(true)
 	app.SetRoot(view.GetPrimitive(), true)
 
 	if err := app.Run(); err != nil {
