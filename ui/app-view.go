@@ -90,7 +90,7 @@ func (v *AppView) GetFocusableComponents() []tview.Primitive {
 	return focusables
 }
 
-func (v *AppView) SetController(controller AppController) {
+func (v *AppView) Bind(controller AppController) {
 	v.controller = controller
 	v.methodDropdown.Bind(controller)
 	v.urlInput.Bind(controller)

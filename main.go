@@ -11,18 +11,15 @@ import (
 func main() {
 
 	model := model.NewAppModel("./callapitter.db")
-
+    view := ui.NewAppView()
 	controller := controller.NewAppController()
 
-	app := tview.NewApplication()
-
-	view := ui.NewAppView()
-
-	controller.SetView(view)
-	controller.SetModel(model)
-	view.SetController(controller)
+	controller.Bind(model, view)
+	view.Bind(controller)
 
 	components := view.GetFocusableComponents()
+
+    app := tview.NewApplication()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
