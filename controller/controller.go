@@ -63,6 +63,31 @@ func (c *AppController) CreateRequest() {
     c.view.SetRequests(requests)
 }
 
+func (c *AppController) SetRequests() {
+    requests, err := c.GetRequests()
+
+    if err != nil {
+        c.view.SetStatus(err.Error())
+    }
+
+    c.view.SetRequests(requests)
+}
+
+func (c *AppController) HandleRequestSelected(index int) {
+    req := c.model.Request.GetRequest(index)
+    c.view.RequestSelected(req)
+}
+
+func (c *AppController) SetHosts() {
+    hosts, err := c.GetHosts()
+
+    if err != nil {
+        c.view.SetStatus(err.Error())
+    }
+
+    c.view.SetHosts(hosts)
+}
+
 func (c *AppController) DeleteRequest(index int) {
 
     err := c.model.Request.DeleteRequest(index)

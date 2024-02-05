@@ -13,7 +13,10 @@ type AppController interface {
     GetRequests() ([]model.Request, error)
     UpdateRequest(model.Request)
     GetHosts() ([]model.Host, error)
+    SetHosts()
     SelectRequest(index int)
+    SetRequests()
+    HandleRequestSelected(index int)
 }
 
 var defaultHeaders = []ui.Header{
@@ -32,15 +35,13 @@ type AppView struct {
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
 
-    requests []model.Request
     hosts []model.Host
 
     controller AppController
 }
 
 func NewAppLayout() *AppView {
-
-    l := &AppView{
+    return &AppView{
         view: tview.NewFlex(),
         statusBar: ui.NewStatusBar(),
         methodDropdown: ui.NewMethodDropdown(),
@@ -51,90 +52,65 @@ func NewAppLayout() *AppView {
         reqList: ui.NewRequestList(),
         resBox: ui.NewResponseView(),
         sendBtn: ui.NewSendButton(),
-
     }
-    
-	l.reqList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
-		selected := l.requests[index]
-		l.methodDropdown.SetCurrentOption(selected)
-		l.urlInput.SetText(selected)
-		l.headersTable.DisplayHeaders(defaultHeaders)
-		l.reqBody.SetText(selected.Body.String)
-		l.resBox.SetContent(selected.LastResponse.String)
-	})
-
-	return l
 }
 
-func (l *AppView) GetPrimitive() tview.Primitive {
+func (v *AppView) GetPrimitive() tview.Primitive {
 
-	l.view.AddItem(l.reqList.GetPrimitive(), 50, 1, true).
+	v.view.AddItem(v.reqList.GetPrimitive(), 50, 1, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-				AddItem(l.methodDropdown.GetPrimitive(), 15, 1, false).
-				AddItem(l.hostDropdown.GetPrimitive(), 45, 1, false).
-				AddItem(l.urlInput.GetPrimitive(), 0, 1, false).
-				AddItem(l.sendBtn.GetPrimitive(), 12, 1, false),
+				AddItem(v.methodDropdown.GetPrimitive(), 15, 1, false).
+				AddItem(v.hostDropdown.GetPrimitive(), 45, 1, false).
+				AddItem(v.urlInput.GetPrimitive(), 0, 1, false).
+				AddItem(v.sendBtn.GetPrimitive(), 12, 1, false),
 				3, 1, false).
 			AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-				AddItem(l.reqBody.GetPrimitive(), 0, 5, false).
-				AddItem(l.headersTable.GetPrimitive(), 0, 5, false),
+				AddItem(v.reqBody.GetPrimitive(), 0, 5, false).
+				AddItem(v.headersTable.GetPrimitive(), 0, 5, false),
 				0, 5, false).
-			AddItem(l.resBox.GetPrimitive(), 0, 5, false).
-			AddItem(l.statusBar.GetPrimitive(), 3, 1, false),
+			AddItem(v.resBox.GetPrimitive(), 0, 5, false).
+			AddItem(v.statusBar.GetPrimitive(), 3, 1, false),
 			0, 2, false,
 		)
 
-    hosts, err := l.controller.GetHosts()
-    if err != nil {
-        l.statusBar.SetStatus(err.Error())
-    }
-    l.hosts = hosts
-    l.hostDropdown.SetHosts(l.hosts)
+    v.controller.SetHosts() 
+    v.controller.SetRequests()
 
-    requests, err := l.controller.GetRequests()
-    if err != nil {
-        l.statusBar.SetStatus(err.Error())
-    }
-
-    l.requests = requests
-    l.reqList.SetContent(l.requests)
-
-	return l.view
+	return v.view
 }
 
-func (l *AppView) GetFocusableComponents() []tview.Primitive {
+func (v *AppView) GetFocusableComponents() []tview.Primitive {
 	focusables := []tview.Primitive{
-		l.reqList.GetPrimitive(),
-		l.methodDropdown.GetPrimitive(),
-		l.hostDropdown.GetPrimitive(),
-		l.urlInput.GetPrimitive(),
-		l.reqBody.GetPrimitive(),
-		l.headersTable.GetPrimitive(),
-		l.resBox.GetPrimitive(),
+		v.reqList.GetPrimitive(),
+		v.methodDropdown.GetPrimitive(),
+		v.hostDropdown.GetPrimitive(),
+		v.urlInput.GetPrimitive(),
+		v.reqBody.GetPrimitive(),
+		v.headersTable.GetPrimitive(),
+		v.resBox.GetPrimitive(),
 	}
 	return focusables
 }
 
-func (l *AppView) SetController(controller AppController) {
-    l.controller = controller
-    l.methodDropdown.OnChange(controller)
-    l.urlInput.OnChange(controller)
-    l.reqList.SetHandler(controller)
+func (v *AppView) SetController(controller AppController) {
+    v.controller = controller
+    v.methodDropdown.OnChange(controller)
+    v.urlInput.OnChange(controller)
+    v.reqList.SetHandler(controller)
 }
 
 func (v *AppView) SetStatus(status string) {
     v.statusBar.SetStatus(status)
 }
 
-func (l *AppView) SetRequests(requests []model.Request) {
-    l.requests = requests
-    l.reqList.SetContent(l.requests)
+func (v *AppView) SetRequests(requests []model.Request) {
+    v.reqList.SetContent(requests)
 }
 
-func (l *AppView) SetHosts(hosts []model.Host) {
-    l.hosts = hosts
-    l.hostDropdown.SetHosts(l.hosts)
+func (v *AppView) SetHosts(hosts []model.Host) {
+    v.hosts = hosts
+    v.hostDropdown.SetHosts(v.hosts)
 }
 
 func (v *AppView) SetResponse(body string) {
@@ -147,4 +123,12 @@ func (v *AppView) SetSelectedRequest(index int) {
 
 func (v *AppView) GetSelectedHost() string {
     return v.hostDropdown.GetSelectedHost()
+}
+
+func (v *AppView) RequestSelected(req model.Request) {
+    v.methodDropdown.SetCurrentOption(req)
+    v.urlInput.SetText(req)
+    v.headersTable.DisplayHeaders(defaultHeaders)
+    v.reqBody.SetText(req.Body.String)
+    v.resBox.SetContent(req.LastResponse.String)
 }

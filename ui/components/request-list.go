@@ -13,6 +13,7 @@ type Handler interface {
     SelectRequest(index int)
     CreateRequest()
     SendRequest(index int)
+    HandleRequestSelected(index int)
 }
 
 type RequestList struct {
@@ -34,6 +35,7 @@ func NewRequestList() *RequestList {
 
     r := &RequestList{view: view}
     r.setKeybindings()
+    r.setChangedFunc()
 	return r 
 }
 
@@ -52,16 +54,11 @@ func (r *RequestList) SetContent(requests []model.Request) {
 	}
 }
 
-func (r *RequestList) SetChangedFunc(f func(index int, mainText, secondaryText string, shortcut rune)) {
-	r.view.SetChangedFunc(f)
-}
-
-func (r *RequestList) SetSelectedFunc(f func(index int, mainText, secondaryText string, shortcut rune)) {
-	r.view.SetSelectedFunc(f)
-}
-
-func (r *RequestList) SetInputCapture(f func(event *tcell.EventKey) *tcell.EventKey) {
-	r.view.SetInputCapture(f)
+func (r *RequestList) setChangedFunc() {
+    onChanged := func (index int, mainText, secondaryText string, shortcut rune) {
+        r.handler.HandleRequestSelected(index)
+    }
+    r.view.SetChangedFunc(onChanged)
 }
 
 func (r *RequestList) GetSelectedRequest() int {
@@ -94,5 +91,5 @@ func (r *RequestList) setKeybindings() {
         return event
     }
 
-    r.SetInputCapture(keybinds)
+    r.view.SetInputCapture(keybinds)
 }
