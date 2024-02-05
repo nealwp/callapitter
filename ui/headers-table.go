@@ -4,7 +4,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-type Header struct {
+type RequestHeader struct {
 	Key   string
 	Value string
 }
@@ -26,7 +26,7 @@ func (h *HeadersTable) GetPrimitive() tview.Primitive {
 	return h.view
 }
 
-func (h *HeadersTable) DisplayHeaders(headers []Header) {
+func (h *HeadersTable) DisplayHeaders(headers []RequestHeader) {
 	h.view.Clear()
 	for _, hdr := range headers {
 

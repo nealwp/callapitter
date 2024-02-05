@@ -8,17 +8,9 @@ import (
 	"github.com/rivo/tview"
 )
 
-type Handler interface {
-	DeleteRequest(index int)
-	SelectRequest(index int)
-	CreateRequest()
-	SendRequest(index int)
-	HandleRequestSelected(index int)
-}
-
 type RequestList struct {
 	view    *tview.List
-	handler Handler
+	handler AppController
 }
 
 func NewRequestList() *RequestList {
@@ -43,7 +35,7 @@ func (r *RequestList) GetPrimitive() tview.Primitive {
 	return r.view
 }
 
-func (r *RequestList) SetHandler(handler Handler) {
+func (r *RequestList) Bind(handler AppController) {
 	r.handler = handler
 }
 
@@ -55,10 +47,9 @@ func (r *RequestList) SetContent(requests []model.Request) {
 }
 
 func (r *RequestList) setChangedFunc() {
-	onChanged := func(index int, mainText, secondaryText string, shortcut rune) {
+	r.view.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
 		r.handler.HandleRequestSelected(index)
-	}
-	r.view.SetChangedFunc(onChanged)
+	})
 }
 
 func (r *RequestList) GetSelectedRequest() int {

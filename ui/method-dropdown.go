@@ -6,13 +6,9 @@ import (
 	"github.com/rivo/tview"
 )
 
-type ChangeHandler interface {
-	UpdateRequest(req model.Request)
-}
-
 type MethodDropdown struct {
 	view    *tview.DropDown
-	handler ChangeHandler
+	handler AppController
 	request model.Request
 }
 
@@ -42,7 +38,7 @@ func (m *MethodDropdown) GetPrimitive() tview.Primitive {
 	return m.view
 }
 
-func (m *MethodDropdown) OnChange(handler ChangeHandler) {
+func (m *MethodDropdown) Bind(handler AppController) {
 	m.handler = handler
 }
 

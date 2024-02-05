@@ -8,7 +8,7 @@ import (
 
 type UrlInput struct {
 	view    *tview.InputField
-	handler ChangeHandler
+	handler AppController
 	request model.Request
 }
 
@@ -39,7 +39,7 @@ func (u *UrlInput) SetText(req model.Request) {
 	u.view.SetText(req.Endpoint)
 }
 
-func (u *UrlInput) OnChange(handler ChangeHandler) {
+func (u *UrlInput) Bind(handler AppController) {
 	u.handler = handler
 }
 

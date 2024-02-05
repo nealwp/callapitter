@@ -1,11 +1,8 @@
 package ui
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
-
-var BG_COLOR = tcell.ColorDefault
 
 type StatusBar struct {
 	view *tview.TextView

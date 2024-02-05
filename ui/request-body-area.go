@@ -26,6 +26,7 @@ func (r *RequestBodyArea) GetPrimitive() tview.Primitive {
 
 // TODO: make this not editable, open $EDITOR to modify instead
 func (r *RequestBodyArea) SetText(text string) {
+    // TODO: should content come in already formatted?
 	pretty := PrettyPrintJSON(text)
 	r.view.SetText(pretty, false)
 }
