@@ -1,165 +1,165 @@
 package controller
 
 import (
-    "net/http"
-    "io"
-    "strings"
+	"io"
+	"net/http"
+	"strings"
 
 	"github.com/nealwp/callapitter/model"
 	"github.com/nealwp/callapitter/ui"
 )
 
 type AppController struct {
-    model *model.AppModel
-    view *ui.AppView
+	model *model.AppModel
+	view  *ui.AppView
 }
 
 func NewAppController() *AppController {
-    return &AppController{}
+	return &AppController{}
 }
 
 func (c *AppController) SetView(view *ui.AppView) {
-    c.view = view
+	c.view = view
 }
 
 func (c *AppController) SetModel(model *model.AppModel) {
-    c.model = model
+	c.model = model
 }
 
 func (c *AppController) SendRequest(i int) {
 
-    host := c.view.GetSelectedHost()
-    req := c.model.Request.GetRequest(i)
+	host := c.view.GetSelectedHost()
+	req := c.model.Request.GetRequest(i)
 
-    res, err := sendRequest(req, host)    
+	res, err := sendRequest(req, host)
 
-    if err != nil {
-        c.view.SetStatus(err.Error())  
-        return
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    c.view.SetResponse(res.Body)
-    c.view.SetStatus(res.Status)
+	c.view.SetResponse(res.Body)
+	c.view.SetStatus(res.Status)
 
-    //l.requests[index].LastResponse = sql.NullString{String: res.Body, Valid: true}
+	//l.requests[index].LastResponse = sql.NullString{String: res.Body, Valid: true}
 }
 
 func (c *AppController) CreateRequest() {
-    
-    req := model.Request{Method: "GET", Endpoint: "/"}
 
-    err := c.model.Request.InsertRequest(req) 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return 
-    }
+	req := model.Request{Method: "GET", Endpoint: "/"}
 
-    requests, err := c.GetRequests()
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	err := c.model.Request.InsertRequest(req)
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    c.view.SetRequests(requests)
+	requests, err := c.GetRequests()
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
+
+	c.view.SetRequests(requests)
 }
 
 func (c *AppController) SetRequests() {
-    requests, err := c.GetRequests()
+	requests, err := c.GetRequests()
 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+	}
 
-    c.view.SetRequests(requests)
+	c.view.SetRequests(requests)
 }
 
 func (c *AppController) HandleRequestSelected(index int) {
-    req := c.model.Request.GetRequest(index)
-    c.view.RequestSelected(req)
+	req := c.model.Request.GetRequest(index)
+	c.view.RequestSelected(req)
 }
 
 func (c *AppController) SetHosts() {
-    hosts, err := c.GetHosts()
+	hosts, err := c.GetHosts()
 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+	}
 
-    c.view.SetHosts(hosts)
+	c.view.SetHosts(hosts)
 }
 
 func (c *AppController) DeleteRequest(index int) {
 
-    err := c.model.Request.DeleteRequest(index)
+	err := c.model.Request.DeleteRequest(index)
 
-    if err != nil {
-        c.view.SetStatus(err.Error())     
-        return
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    requests, err := c.GetRequests()
+	requests, err := c.GetRequests()
 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    c.view.SetRequests(requests)
+	c.view.SetRequests(requests)
 }
 
 func (c *AppController) SelectRequest(index int) {
-   c.view.SetSelectedRequest(index)
+	c.view.SetSelectedRequest(index)
 }
 
 func (c *AppController) GetRequests() ([]model.Request, error) {
-    requests, err := c.model.Request.GetRequests()
-    if err != nil {
-        return nil, err
-    }
-    return requests, nil
+	requests, err := c.model.Request.GetRequests()
+	if err != nil {
+		return nil, err
+	}
+	return requests, nil
 }
 
 func (c *AppController) UpdateRequest(req model.Request) {
-    err := c.model.Request.UpdateRequest(req)
+	err := c.model.Request.UpdateRequest(req)
 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    requests, err := c.GetRequests()
+	requests, err := c.GetRequests()
 
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    c.view.SetRequests(requests)
+	c.view.SetRequests(requests)
 }
 
 func (c *AppController) CreateHost(host model.Host) {
 
-    err := c.model.Host.InsertHost(host)
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	err := c.model.Host.InsertHost(host)
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    hosts, err := c.GetHosts()
-    if err != nil {
-        c.view.SetStatus(err.Error())
-        return
-    }
+	hosts, err := c.GetHosts()
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
 
-    c.view.SetHosts(hosts)
+	c.view.SetHosts(hosts)
 }
 
 func (c *AppController) GetHosts() ([]model.Host, error) {
-    hosts, err := c.model.Host.GetHosts()
-    if err != nil {
-        return nil, err
-    }
-    return hosts, nil
+	hosts, err := c.model.Host.GetHosts()
+	if err != nil {
+		return nil, err
+	}
+	return hosts, nil
 }
 
 type HttpResponse struct {
@@ -168,20 +168,20 @@ type HttpResponse struct {
 }
 
 func sendRequest(req model.Request, host string) (HttpResponse, error) {
-    client := &http.Client{}
+	client := &http.Client{}
 
 	url := host + req.Endpoint
 
-    request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body.String))
-    if err != nil {
-       return HttpResponse{}, err 
-    }
+	request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body.String))
+	if err != nil {
+		return HttpResponse{}, err
+	}
 
 	// do header things later
 
 	response, err := client.Do(request)
 	if err != nil {
-	    return HttpResponse{}, err	
+		return HttpResponse{}, err
 	}
 
 	defer response.Body.Close()

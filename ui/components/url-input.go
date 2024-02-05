@@ -7,9 +7,9 @@ import (
 )
 
 type UrlInput struct {
-	view *tview.InputField
-    handler ChangeHandler
-    request model.Request
+	view    *tview.InputField
+	handler ChangeHandler
+	request model.Request
 }
 
 func NewUrlInput() *UrlInput {
@@ -23,11 +23,11 @@ func NewUrlInput() *UrlInput {
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
 
-    u := &UrlInput{view: view}
-    u.setDoneFunc()
-    u.setInputCapture()
+	u := &UrlInput{view: view}
+	u.setDoneFunc()
+	u.setInputCapture()
 
-	return u 
+	return u
 }
 
 func (u *UrlInput) GetPrimitive() tview.Primitive {
@@ -35,26 +35,25 @@ func (u *UrlInput) GetPrimitive() tview.Primitive {
 }
 
 func (u *UrlInput) SetText(req model.Request) {
-    u.request = req
+	u.request = req
 	u.view.SetText(req.Endpoint)
 }
 
 func (u *UrlInput) OnChange(handler ChangeHandler) {
-    u.handler = handler
+	u.handler = handler
 }
 
 func (u *UrlInput) setInputCapture() {
-    u.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        return event
-    })
+	u.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		return event
+	})
 }
 
 func (u *UrlInput) setDoneFunc() {
-    u.view.SetDoneFunc(func(key tcell.Key){
-        if key == tcell.KeyEnter {
-            u.request.Endpoint = u.view.GetText()
-            u.handler.UpdateRequest(u.request)
-        }
-    })
+	u.view.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter {
+			u.request.Endpoint = u.view.GetText()
+			u.handler.UpdateRequest(u.request)
+		}
+	})
 }
-

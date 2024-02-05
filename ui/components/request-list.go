@@ -9,16 +9,16 @@ import (
 )
 
 type Handler interface {
-    DeleteRequest(index int)
-    SelectRequest(index int)
-    CreateRequest()
-    SendRequest(index int)
-    HandleRequestSelected(index int)
+	DeleteRequest(index int)
+	SelectRequest(index int)
+	CreateRequest()
+	SendRequest(index int)
+	HandleRequestSelected(index int)
 }
 
 type RequestList struct {
-	view *tview.List
-    handler Handler
+	view    *tview.List
+	handler Handler
 }
 
 func NewRequestList() *RequestList {
@@ -33,10 +33,10 @@ func NewRequestList() *RequestList {
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetBorderPadding(1, 1, 1, 1)
 
-    r := &RequestList{view: view}
-    r.setKeybindings()
-    r.setChangedFunc()
-	return r 
+	r := &RequestList{view: view}
+	r.setKeybindings()
+	r.setChangedFunc()
+	return r
 }
 
 func (r *RequestList) GetPrimitive() tview.Primitive {
@@ -44,21 +44,21 @@ func (r *RequestList) GetPrimitive() tview.Primitive {
 }
 
 func (r *RequestList) SetHandler(handler Handler) {
-    r.handler = handler
+	r.handler = handler
 }
 
 func (r *RequestList) SetContent(requests []model.Request) {
-    r.view.Clear()
+	r.view.Clear()
 	for _, req := range requests {
 		r.view.AddItem(fmt.Sprintf("%-4s", req.Method)+"  "+req.Endpoint, "", 0, nil)
 	}
 }
 
 func (r *RequestList) setChangedFunc() {
-    onChanged := func (index int, mainText, secondaryText string, shortcut rune) {
-        r.handler.HandleRequestSelected(index)
-    }
-    r.view.SetChangedFunc(onChanged)
+	onChanged := func(index int, mainText, secondaryText string, shortcut rune) {
+		r.handler.HandleRequestSelected(index)
+	}
+	r.view.SetChangedFunc(onChanged)
 }
 
 func (r *RequestList) GetSelectedRequest() int {
@@ -71,25 +71,25 @@ func (r *RequestList) SetSelectedRequest(index int) {
 
 func (r *RequestList) setKeybindings() {
 
-    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
-        index := r.view.GetCurrentItem()
-        if event.Key() == tcell.KeyRune {
-            switch event.Rune() {
-            case 'D':
-                r.handler.DeleteRequest(index)
-            case 'j': 
-                r.handler.SelectRequest(index+1)
-            case 'k':
-                r.handler.SelectRequest(index-1)
-            case '%':
-                r.handler.CreateRequest()
-            }
-            return event
-        } else if event.Key() == tcell.KeyEnter {
-            r.handler.SendRequest(index)
-        }
-        return event
-    }
+	keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+		index := r.view.GetCurrentItem()
+		if event.Key() == tcell.KeyRune {
+			switch event.Rune() {
+			case 'D':
+				r.handler.DeleteRequest(index)
+			case 'j':
+				r.handler.SelectRequest(index + 1)
+			case 'k':
+				r.handler.SelectRequest(index - 1)
+			case '%':
+				r.handler.CreateRequest()
+			}
+			return event
+		} else if event.Key() == tcell.KeyEnter {
+			r.handler.SendRequest(index)
+		}
+		return event
+	}
 
-    r.view.SetInputCapture(keybinds)
+	r.view.SetInputCapture(keybinds)
 }

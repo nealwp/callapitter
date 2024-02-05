@@ -13,8 +13,8 @@ func NewRequestForm() *RequestForm {
 	title := "Add Request"
 
 	view := tview.NewForm()
-    view.AddInputField("URL", "", 20, nil, nil)
-    view.AddDropDown("Method", []string{"GET", "DELETE", "POST", "PUT"}, 0, nil)
+	view.AddInputField("URL", "", 20, nil, nil)
+	view.AddDropDown("Method", []string{"GET", "DELETE", "POST", "PUT"}, 0, nil)
 	view.SetBorder(true)
 	view.SetBackgroundColor(BG_COLOR)
 	view.SetTitle(title)

@@ -7,8 +7,8 @@ import (
 )
 
 type HostDropdown struct {
-	view *tview.DropDown
-    hosts []model.Host
+	view  *tview.DropDown
+	hosts []model.Host
 }
 
 func NewHostDropdown() *HostDropdown {
@@ -24,9 +24,9 @@ func NewHostDropdown() *HostDropdown {
 	view.SetBorder(true)
 	view.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
 
-    h := &HostDropdown{view: view}
-    h.setKeyBindings()
-    return h
+	h := &HostDropdown{view: view}
+	h.setKeyBindings()
+	return h
 }
 
 func (h *HostDropdown) GetPrimitive() tview.Primitive {
@@ -34,16 +34,16 @@ func (h *HostDropdown) GetPrimitive() tview.Primitive {
 }
 
 func (h *HostDropdown) SetHosts(hosts []model.Host) {
-    
-    h.hosts = hosts
 
-    var hostnames []string
+	h.hosts = hosts
 
-    for _, h := range(hosts) {
-        hostnames = append(hostnames, h.Name)
-    }
+	var hostnames []string
 
-    h.view.SetOptions(hostnames, nil)
+	for _, h := range hosts {
+		hostnames = append(hostnames, h.Name)
+	}
+
+	h.view.SetOptions(hostnames, nil)
 	h.view.SetCurrentOption(0)
 }
 
@@ -54,7 +54,7 @@ func (h *HostDropdown) GetSelectedHost() string {
 
 func (h *HostDropdown) setKeyBindings() {
 
-    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+	keybinds := func(event *tcell.EventKey) *tcell.EventKey {
 		index, _ := h.view.GetCurrentOption()
 
 		if event.Key() == tcell.KeyRune {
@@ -76,5 +76,5 @@ func (h *HostDropdown) setKeyBindings() {
 		return event
 	}
 
-    h.view.SetInputCapture(keybinds)
+	h.view.SetInputCapture(keybinds)
 }

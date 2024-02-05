@@ -7,16 +7,16 @@ import (
 )
 
 type AppController interface {
-    SendRequest(index int)
-    CreateRequest()
-    DeleteRequest(index int)
-    GetRequests() ([]model.Request, error)
-    UpdateRequest(model.Request)
-    GetHosts() ([]model.Host, error)
-    SetHosts()
-    SelectRequest(index int)
-    SetRequests()
-    HandleRequestSelected(index int)
+	SendRequest(index int)
+	CreateRequest()
+	DeleteRequest(index int)
+	GetRequests() ([]model.Request, error)
+	UpdateRequest(model.Request)
+	GetHosts() ([]model.Host, error)
+	SetHosts()
+	SelectRequest(index int)
+	SetRequests()
+	HandleRequestSelected(index int)
 }
 
 var defaultHeaders = []ui.Header{
@@ -24,33 +24,33 @@ var defaultHeaders = []ui.Header{
 }
 
 type AppView struct {
-    view *tview.Flex
-    statusBar *ui.StatusBar
-    methodDropdown *ui.MethodDropdown
-    hostDropdown *ui.HostDropdown
-    urlInput *ui.UrlInput
-    headersTable *ui.HeadersTable
-    reqBody *ui.RequestBodyArea
-    reqList *ui.RequestList
-    resBox *ui.ResponseView
-    sendBtn *ui.SendButton
+	view           *tview.Flex
+	statusBar      *ui.StatusBar
+	methodDropdown *ui.MethodDropdown
+	hostDropdown   *ui.HostDropdown
+	urlInput       *ui.UrlInput
+	headersTable   *ui.HeadersTable
+	reqBody        *ui.RequestBodyArea
+	reqList        *ui.RequestList
+	resBox         *ui.ResponseView
+	sendBtn        *ui.SendButton
 
-    controller AppController
+	controller AppController
 }
 
 func NewAppView() *AppView {
-    return &AppView{
-        view: tview.NewFlex(),
-        statusBar: ui.NewStatusBar(),
-        methodDropdown: ui.NewMethodDropdown(),
-        hostDropdown: ui.NewHostDropdown(),
-        urlInput: ui.NewUrlInput(),
-        headersTable: ui.NewHeadersTable(),
-        reqBody: ui.NewRequestBodyArea(),
-        reqList: ui.NewRequestList(),
-        resBox: ui.NewResponseView(),
-        sendBtn: ui.NewSendButton(),
-    }
+	return &AppView{
+		view:           tview.NewFlex(),
+		statusBar:      ui.NewStatusBar(),
+		methodDropdown: ui.NewMethodDropdown(),
+		hostDropdown:   ui.NewHostDropdown(),
+		urlInput:       ui.NewUrlInput(),
+		headersTable:   ui.NewHeadersTable(),
+		reqBody:        ui.NewRequestBodyArea(),
+		reqList:        ui.NewRequestList(),
+		resBox:         ui.NewResponseView(),
+		sendBtn:        ui.NewSendButton(),
+	}
 }
 
 func (v *AppView) GetPrimitive() tview.Primitive {
@@ -72,8 +72,8 @@ func (v *AppView) GetPrimitive() tview.Primitive {
 			0, 2, false,
 		)
 
-    v.controller.SetHosts() 
-    v.controller.SetRequests()
+	v.controller.SetHosts()
+	v.controller.SetRequests()
 
 	return v.view
 }
@@ -92,40 +92,40 @@ func (v *AppView) GetFocusableComponents() []tview.Primitive {
 }
 
 func (v *AppView) SetController(controller AppController) {
-    v.controller = controller
-    v.methodDropdown.OnChange(controller)
-    v.urlInput.OnChange(controller)
-    v.reqList.SetHandler(controller)
+	v.controller = controller
+	v.methodDropdown.OnChange(controller)
+	v.urlInput.OnChange(controller)
+	v.reqList.SetHandler(controller)
 }
 
 func (v *AppView) SetStatus(status string) {
-    v.statusBar.SetStatus(status)
+	v.statusBar.SetStatus(status)
 }
 
 func (v *AppView) SetRequests(requests []model.Request) {
-    v.reqList.SetContent(requests)
+	v.reqList.SetContent(requests)
 }
 
 func (v *AppView) SetHosts(hosts []model.Host) {
-    v.hostDropdown.SetHosts(hosts)
+	v.hostDropdown.SetHosts(hosts)
 }
 
 func (v *AppView) SetResponse(body string) {
-    v.resBox.SetContent(body)
+	v.resBox.SetContent(body)
 }
 
 func (v *AppView) SetSelectedRequest(index int) {
-    v.reqList.SetSelectedRequest(index)
+	v.reqList.SetSelectedRequest(index)
 }
 
 func (v *AppView) GetSelectedHost() string {
-    return v.hostDropdown.GetSelectedHost()
+	return v.hostDropdown.GetSelectedHost()
 }
 
 func (v *AppView) RequestSelected(req model.Request) {
-    v.methodDropdown.SetCurrentOption(req)
-    v.urlInput.SetText(req)
-    v.headersTable.DisplayHeaders(defaultHeaders)
-    v.reqBody.SetText(req.Body.String)
-    v.resBox.SetContent(req.LastResponse.String)
+	v.methodDropdown.SetCurrentOption(req)
+	v.urlInput.SetText(req)
+	v.headersTable.DisplayHeaders(defaultHeaders)
+	v.reqBody.SetText(req.Body.String)
+	v.resBox.SetContent(req.LastResponse.String)
 }
