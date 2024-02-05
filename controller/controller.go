@@ -123,33 +123,35 @@ func (c *AppController) UpdateRequest(req model.Request) {
     err := c.model.Request.UpdateRequest(req)
 
     if err != nil {
-        panic(err)
+        c.view.SetStatus(err.Error())
+        return
     }
 
     requests, err := c.GetRequests()
 
     if err != nil {
-        panic(err)
+        c.view.SetStatus(err.Error())
+        return
     }
 
     c.view.SetRequests(requests)
 }
 
-func (c *AppController) CreateHost(host model.Host) error {
+func (c *AppController) CreateHost(host model.Host) {
 
     err := c.model.Host.InsertHost(host)
     if err != nil {
-        panic(err)
+        c.view.SetStatus(err.Error())
+        return
     }
 
     hosts, err := c.GetHosts()
     if err != nil {
-        return err
+        c.view.SetStatus(err.Error())
+        return
     }
 
     c.view.SetHosts(hosts)
-    return nil
-
 }
 
 func (c *AppController) GetHosts() ([]model.Host, error) {
@@ -172,14 +174,14 @@ func sendRequest(req model.Request, host string) (HttpResponse, error) {
 
     request, err := http.NewRequest(req.Method, url, strings.NewReader(req.Body.String))
     if err != nil {
-        panic(err)
+       return HttpResponse{}, err 
     }
 
 	// do header things later
 
 	response, err := client.Do(request)
 	if err != nil {
-		panic(err)
+	    return HttpResponse{}, err	
 	}
 
 	defer response.Body.Close()

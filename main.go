@@ -17,7 +17,7 @@ func main() {
     
     app := tview.NewApplication()
 
-    view := ui.NewAppLayout()
+    view := ui.NewAppView()
 
     controller.SetView(view)
     controller.SetModel(model)

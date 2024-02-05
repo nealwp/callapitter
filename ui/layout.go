@@ -35,12 +35,10 @@ type AppView struct {
     resBox *ui.ResponseView
     sendBtn *ui.SendButton
 
-    hosts []model.Host
-
     controller AppController
 }
 
-func NewAppLayout() *AppView {
+func NewAppView() *AppView {
     return &AppView{
         view: tview.NewFlex(),
         statusBar: ui.NewStatusBar(),
@@ -109,8 +107,7 @@ func (v *AppView) SetRequests(requests []model.Request) {
 }
 
 func (v *AppView) SetHosts(hosts []model.Host) {
-    v.hosts = hosts
-    v.hostDropdown.SetHosts(v.hosts)
+    v.hostDropdown.SetHosts(hosts)
 }
 
 func (v *AppView) SetResponse(body string) {
