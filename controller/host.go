@@ -39,5 +39,18 @@ func (c *AppController) GetHosts() ([]model.Host, error) {
 
 func (c *AppController) AddHost() {
     c.view.SetStatus("Enter new host name: ")
+
+    cb := func(host string) {
+        if host != "" {
+            c.CreateHost(model.Host{Name: host})
+            c.view.SetStatus("Host " + host + " created")
+        } else {
+            c.view.SetStatus("")
+        }
+
+        c.app.SetFocus(c.view.HostDropdown.GetPrimitive())
+    }
+
+    c.view.OnStatusInputSubmit(cb)
     c.app.SetFocus(c.view.GetStatusBar())
 }
