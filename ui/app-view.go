@@ -20,6 +20,8 @@ type AppController interface {
 	SetRequests()
 	HandleRequestSelected(index int)
     AddHost()
+    EditRequestBody(body string)
+    AppSync()
 }
 
 var defaultHeaders = []RequestHeader{
@@ -33,7 +35,7 @@ type AppView struct {
 	HostDropdown   *HostDropdown
 	urlInput       *UrlInput
 	headersTable   *HeadersTable
-	requestBody    *RequestBodyArea
+	RequestBody    *RequestBodyArea
 	requestList    *RequestList
 	responseBox    *ResponseView
 
@@ -48,7 +50,7 @@ func NewAppView() *AppView {
 		HostDropdown:   NewHostDropdown(),
 		urlInput:       NewUrlInput(),
 		headersTable:   NewHeadersTable(),
-		requestBody:    NewRequestBodyArea(),
+		RequestBody:    NewRequestBodyArea(),
 		requestList:    NewRequestList(),
 		responseBox:    NewResponseView(),
 	}
@@ -68,7 +70,7 @@ func (v *AppView) GetPrimitive() tview.Primitive {
                     3, 1, false).
 
                 AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-                    AddItem(v.requestBody.GetPrimitive(), 0, 5, false).
+                    AddItem(v.RequestBody.GetPrimitive(), 0, 5, false).
                     AddItem(v.headersTable.GetPrimitive(), 0, 5, false),
                     0, 5, false).
 
@@ -93,7 +95,7 @@ func (v *AppView) GetFocusableComponents() []tview.Primitive {
 		v.methodDropdown.GetPrimitive(),
 		v.HostDropdown.GetPrimitive(),
 		v.urlInput.GetPrimitive(),
-		v.requestBody.GetPrimitive(),
+		v.RequestBody.GetPrimitive(),
 		v.headersTable.GetPrimitive(),
 		v.responseBox.GetPrimitive(),
 	}
@@ -106,6 +108,7 @@ func (v *AppView) Bind(controller AppController) {
 	v.urlInput.Bind(controller)
 	v.requestList.Bind(controller)
     v.HostDropdown.Bind(controller)
+    v.RequestBody.Bind(controller)
 }
 
 func (v *AppView) SetStatus(status string) {
@@ -136,7 +139,7 @@ func (v *AppView) RequestSelected(req model.Request) {
 	v.methodDropdown.SetCurrentOption(req)
 	v.urlInput.SetText(req)
 	v.headersTable.DisplayHeaders(defaultHeaders)
-	v.requestBody.SetText(req.Body.String)
+	v.RequestBody.SetText(req.Body.String)
 	v.responseBox.SetContent(req.LastResponse.String)
 }
 

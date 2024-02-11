@@ -3,7 +3,7 @@ module github.com/nealwp/callapitter
 go 1.21.4
 
 require (
-	github.com/gdamore/tcell/v2 v2.7.0
+	github.com/gdamore/tcell/v2 v2.6.1-0.20231203215052-2917c3801e73
 	github.com/mattn/go-sqlite3 v1.14.21
 	github.com/rivo/tview v0.0.0-20231206124440-5f078138442e
 )

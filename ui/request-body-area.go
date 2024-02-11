@@ -7,6 +7,7 @@ import (
 
 type RequestBodyArea struct {
 	view *tview.TextArea
+    handler AppController
 }
 
 func NewRequestBodyArea() *RequestBodyArea {
@@ -17,11 +18,33 @@ func NewRequestBodyArea() *RequestBodyArea {
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetTextStyle(tcell.StyleDefault.Background(BG_COLOR))
 
-	return &RequestBodyArea{view: view}
+    r := &RequestBodyArea{view: view}
+    r.setInputCapture()
+
+    return r
 }
 
 func (r *RequestBodyArea) GetPrimitive() tview.Primitive {
 	return r.view
+}
+
+func (r *RequestBodyArea) Bind(handler AppController) {
+    r.handler = handler
+}
+
+func (r *RequestBodyArea) setInputCapture() {
+    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+
+        if event.Key() == tcell.KeyCtrlE {
+            r.handler.EditRequestBody(r.view.GetText())
+            r.handler.AppSync()
+            return nil
+        }
+
+        return event
+    }
+
+    r.view.SetInputCapture(keybinds)
 }
 
 // TODO: make this not editable, open $EDITOR to modify instead

@@ -1,6 +1,11 @@
 package controller
 
-import "github.com/nealwp/callapitter/model"
+import (
+	"os"
+	"os/exec"
+
+	"github.com/nealwp/callapitter/model"
+)
 
 func (c *AppController) SendRequest(i int) {
 
@@ -101,4 +106,54 @@ func (c *AppController) UpdateRequest(req model.Request) {
 	}
 
 	c.view.SetRequests(requests)
+}
+
+func (c *AppController) EditRequestBody(body string) {
+    tmpfile, err := os.CreateTemp("", "tmp-*.json")
+    if err != nil {
+        c.view.SetStatus(err.Error())
+		return
+    }
+
+    defer os.Remove(tmpfile.Name())
+
+    _, err = tmpfile.Write([]byte(body))
+    if err != nil {
+        c.view.SetStatus(err.Error())
+        tmpfile.Close()
+		return
+    }
+
+    tmpfile.Close()
+
+    editor := os.Getenv("EDITOR")
+    if editor == "" {
+        editor = "nvim"
+    }
+
+    success := true
+
+    c.app.Suspend(func() {
+        cmd := exec.Command(editor, tmpfile.Name())
+        cmd.Stdin = os.Stdin
+        cmd.Stdout = os.Stdout
+        cmd.Stderr = os.Stderr
+
+        err := cmd.Run()
+        if err != nil {
+           success = false 
+        }
+    })
+
+    if !success {
+        return 
+    }
+
+    updatedContent, err := os.ReadFile(tmpfile.Name())
+
+    if err != nil {
+        panic(err)
+    }
+
+    c.view.RequestBody.SetText(string(updatedContent))
 }
