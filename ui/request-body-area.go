@@ -37,7 +37,6 @@ func (r *RequestBodyArea) setInputCapture() {
 
         if event.Key() == tcell.KeyCtrlE {
             r.handler.EditRequestBody(r.view.GetText())
-            r.handler.AppSync()
             return nil
         }
 
