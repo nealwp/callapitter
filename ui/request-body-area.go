@@ -2,16 +2,18 @@ package ui
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"github.com/nealwp/callapitter/model"
 	"github.com/rivo/tview"
 )
 
 type RequestBodyArea struct {
-	view *tview.TextArea
+	view *tview.TextView
     handler AppController
+    request model.Request
 }
 
 func NewRequestBodyArea() *RequestBodyArea {
-	view := tview.NewTextArea()
+	view := tview.NewTextView()
 	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 	view.SetTitle("Body")
@@ -32,23 +34,23 @@ func (r *RequestBodyArea) Bind(handler AppController) {
     r.handler = handler
 }
 
+func (r *RequestBodyArea) SetRequest(req model.Request) {
+    r.request = req
+	pretty := PrettyPrintJSON(r.request.Body.String)
+	r.view.SetText(pretty)
+}
+
 func (r *RequestBodyArea) setInputCapture() {
     keybinds := func(event *tcell.EventKey) *tcell.EventKey {
-
-        if event.Key() == tcell.KeyCtrlE {
-            r.handler.EditRequestBody(r.view.GetText())
-            return nil
-        }
-
-        return event
+        if event.Key() == tcell.KeyRune {
+            switch event.Rune(){
+            case 'e': 
+                r.handler.EditRequestBody(r.request)
+                return nil
+            }
+        } 
+        return nil
     }
 
     r.view.SetInputCapture(keybinds)
-}
-
-// TODO: make this not editable, open $EDITOR to modify instead
-func (r *RequestBodyArea) SetText(text string) {
-    // TODO: should content come in already formatted?
-	pretty := PrettyPrintJSON(text)
-	r.view.SetText(pretty, false)
 }

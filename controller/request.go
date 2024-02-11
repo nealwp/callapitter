@@ -108,7 +108,8 @@ func (c *AppController) UpdateRequest(req model.Request) {
 	c.view.SetRequests(requests)
 }
 
-func (c *AppController) EditRequestBody(body string) {
+func (c *AppController) EditRequestBody(req model.Request) {
+
     tmpfile, err := os.CreateTemp("", "tmp-*.json")
     if err != nil {
         c.view.SetStatus(err.Error())
@@ -117,7 +118,7 @@ func (c *AppController) EditRequestBody(body string) {
 
     defer os.Remove(tmpfile.Name())
 
-    _, err = tmpfile.Write([]byte(body))
+    _, err = tmpfile.Write([]byte(req.Body.String))
     if err != nil {
         c.view.SetStatus(err.Error())
         tmpfile.Close()
@@ -155,5 +156,7 @@ func (c *AppController) EditRequestBody(body string) {
         panic(err)
     }
 
-    c.view.RequestBody.SetText(string(updatedContent))
+    req.Body.String = string(updatedContent)
+
+    c.UpdateRequest(req)
 }

@@ -26,10 +26,6 @@ func (c *AppController) Bind(app *tview.Application, model *model.AppModel, view
     c.app = app
 }
 
-func (c *AppController) AppSync() {
-    c.app.Sync()
-}
-
 type HttpResponse struct {
 	Body   string
 	Status string

@@ -89,14 +89,14 @@ func (store *RequestStore) DeleteRequest(index int) error {
 
 func (store *RequestStore) UpdateRequest(r Request) error {
 
-	stmt, err := store.DB.Prepare("UPDATE request SET method = ?, endpoint = ? WHERE id = ?;")
+	stmt, err := store.DB.Prepare("UPDATE request SET method = ?, endpoint = ?, body = ? WHERE id = ?;")
 	if err != nil {
 		return err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(r.Method, r.Endpoint, r.Id)
+	_, err = stmt.Exec(r.Method, r.Endpoint, r.Body.String, r.Id)
 
 	if err != nil {
 		return err

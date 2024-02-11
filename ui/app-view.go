@@ -20,8 +20,7 @@ type AppController interface {
 	SetRequests()
 	HandleRequestSelected(index int)
     AddHost()
-    EditRequestBody(body string)
-    AppSync()
+    EditRequestBody(req model.Request)
 }
 
 var defaultHeaders = []RequestHeader{
@@ -139,7 +138,7 @@ func (v *AppView) RequestSelected(req model.Request) {
 	v.methodDropdown.SetCurrentOption(req)
 	v.urlInput.SetText(req)
 	v.headersTable.DisplayHeaders(defaultHeaders)
-	v.RequestBody.SetText(req.Body.String)
+	v.RequestBody.SetRequest(req)
 	v.responseBox.SetContent(req.LastResponse.String)
 }
 
