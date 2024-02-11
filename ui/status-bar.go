@@ -5,13 +5,15 @@ import (
 )
 
 type StatusBar struct {
-	view *tview.TextView
+	view *tview.InputField
 }
 
 func NewStatusBar() *StatusBar {
-	view := tview.NewTextView()
+	view := tview.NewInputField()
 	view.SetBorder(true)
-	view.SetBackgroundColor(BG_COLOR)
+    view.SetDisabled(true)
+    view.SetBackgroundColor(BG_COLOR)
+	view.SetFieldBackgroundColor(BG_COLOR)
 	view.SetTitle("Status")
 	view.SetTitleAlign(tview.AlignLeft)
 
