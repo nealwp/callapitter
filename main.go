@@ -14,12 +14,12 @@ func main() {
     view := ui.NewAppView()
 	controller := controller.NewAppController()
 
-	controller.Bind(model, view)
-	view.Bind(controller)
-
 	components := view.GetFocusableComponents()
 
     app := tview.NewApplication()
+
+    controller.Bind(app, model, view)
+    view.Bind(controller)
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {

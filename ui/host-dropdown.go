@@ -9,6 +9,7 @@ import (
 type HostDropdown struct {
 	view  *tview.DropDown
 	hosts []model.Host
+    handler AppController
 }
 
 func NewHostDropdown() *HostDropdown {
@@ -31,6 +32,10 @@ func NewHostDropdown() *HostDropdown {
 
 func (h *HostDropdown) GetPrimitive() tview.Primitive {
 	return h.view
+}
+
+func (h *HostDropdown) Bind(handler AppController) {
+    h.handler = handler
 }
 
 func (h *HostDropdown) SetHosts(hosts []model.Host) {
@@ -67,6 +72,9 @@ func (h *HostDropdown) setKeyBindings() {
 				prevOption := (index - 1 + len(h.hosts)) % len(h.hosts)
 				h.view.SetCurrentOption(prevOption)
 				return nil
+            case '%':
+                h.handler.AddHost()
+                return nil
 			}
 		} else if event.Key() == tcell.KeyEnter {
 			// set it here

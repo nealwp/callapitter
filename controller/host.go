@@ -36,3 +36,8 @@ func (c *AppController) GetHosts() ([]model.Host, error) {
 	}
 	return hosts, nil
 }
+
+func (c *AppController) AddHost() {
+    c.view.SetStatus("Enter new host name: ")
+    c.app.SetFocus(c.view.GetStatusBar())
+}

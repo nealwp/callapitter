@@ -7,20 +7,23 @@ import (
 
 	"github.com/nealwp/callapitter/model"
 	"github.com/nealwp/callapitter/ui"
+	"github.com/rivo/tview"
 )
 
 type AppController struct {
 	model *model.AppModel
 	view  *ui.AppView
+    app *tview.Application
 }
 
 func NewAppController() *AppController {
 	return &AppController{}
 }
 
-func (c *AppController) Bind(model *model.AppModel, view *ui.AppView) {
+func (c *AppController) Bind(app *tview.Application, model *model.AppModel, view *ui.AppView) {
 	c.view = view
     c.model = model
+    c.app = app
 }
 
 type HttpResponse struct {

@@ -19,6 +19,7 @@ type AppController interface {
 	SelectRequest(index int)
 	SetRequests()
 	HandleRequestSelected(index int)
+    AddHost()
 }
 
 var defaultHeaders = []RequestHeader{
@@ -104,6 +105,7 @@ func (v *AppView) Bind(controller AppController) {
 	v.methodDropdown.Bind(controller)
 	v.urlInput.Bind(controller)
 	v.requestList.Bind(controller)
+    v.hostDropdown.Bind(controller)
 }
 
 func (v *AppView) SetStatus(status string) {
@@ -136,4 +138,8 @@ func (v *AppView) RequestSelected(req model.Request) {
 	v.headersTable.DisplayHeaders(defaultHeaders)
 	v.requestBody.SetText(req.Body.String)
 	v.responseBox.SetContent(req.LastResponse.String)
+}
+
+func (v *AppView) GetStatusBar() tview.Primitive {
+    return v.statusBar.GetPrimitive()
 }
