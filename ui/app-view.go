@@ -56,29 +56,28 @@ func NewAppView() *AppView {
 func (v *AppView) GetPrimitive() tview.Primitive {
 
     v.layout.AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-        
         AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-            AddItem(v.requestList.GetPrimitive(), 50, 1, false).
+            AddItem(v.requestList.GetPrimitive(), 50, 1, true).
                 AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 
                 AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-                AddItem(v.methodDropdown.GetPrimitive(), 15, 1, false).
-                AddItem(v.hostDropdown.GetPrimitive(), 45, 1, false).
-                AddItem(v.urlInput.GetPrimitive(), 0, 1, false),
-                3, 1, false).
+                    AddItem(v.methodDropdown.GetPrimitive(), 15, 1, false).
+                    AddItem(v.hostDropdown.GetPrimitive(), 45, 1, false).
+                    AddItem(v.urlInput.GetPrimitive(), 0, 1, false),
+                    3, 1, false).
 
                 AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-                AddItem(v.requestBody.GetPrimitive(), 0, 5, false).
-                AddItem(v.headersTable.GetPrimitive(), 0, 5, false),
-                0, 5, false).
+                    AddItem(v.requestBody.GetPrimitive(), 0, 5, false).
+                    AddItem(v.headersTable.GetPrimitive(), 0, 5, false),
+                    0, 5, false).
 
                 AddItem(v.responseBox.GetPrimitive(), 0, 5, false),
-            0, 1, false),
-            0, 2, false,
+                0, 1, false),
+            0, 2, true,
         ).
 
-        AddItem(v.statusBar.GetPrimitive(), 3, 1, false), 
-        0, 1, false,
+        AddItem(v.statusBar.GetPrimitive(), 1, 1, false), 
+        0, 1, true,
     )
 
 	v.controller.SetHosts()

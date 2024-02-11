@@ -10,11 +10,8 @@ type StatusBar struct {
 
 func NewStatusBar() *StatusBar {
 	view := tview.NewInputField()
-	view.SetBorder(true)
-    view.SetDisabled(true)
     view.SetBackgroundColor(BG_COLOR)
 	view.SetFieldBackgroundColor(BG_COLOR)
-	view.SetTitle("Status")
 	view.SetTitleAlign(tview.AlignLeft)
 
 	return &StatusBar{view: view}
