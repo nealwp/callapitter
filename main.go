@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/nealwp/callapitter/controller"
 	"github.com/nealwp/callapitter/model"
@@ -10,7 +13,12 @@ import (
 
 func main() {
 
-	model := model.NewAppModel("./callapitter.db")
+    dbPath, err := getDatabasePath()
+    if err != nil {
+        panic(err)
+    }
+
+	model := model.NewAppModel(dbPath)
     view := ui.NewAppView()
 	controller := controller.NewAppController()
 
@@ -56,5 +64,21 @@ func main() {
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
+}
+
+func getDatabasePath() (string, error) {
+    home := os.Getenv("HOME")
+    xdgLocalShare := filepath.Join(home, ".local", "share")
+
+    appDir := filepath.Join(xdgLocalShare, "callapitter")
+
+    if _, err := os.Stat(appDir); os.IsNotExist(err) {
+        if err := os.MkdirAll(appDir, 0755); err != nil {
+            return "", err
+        }
+    }
+
+    dbPath := filepath.Join(appDir, "callapitter.db")
+    return dbPath, nil
 }
 

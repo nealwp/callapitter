@@ -44,6 +44,7 @@ func sendHttpRequest(req model.Request, host string) (HttpResponse, error) {
 	}
 
 	// do header things later
+    request.Header.Add("Content-Type", "application/json")
 
 	response, err := client.Do(request)
 	if err != nil {

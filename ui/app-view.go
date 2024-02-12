@@ -31,7 +31,7 @@ type AppController interface {
 }
 
 var defaultHeaders = []RequestHeader{
-	{Key: "Authorization", Value: "Bearer 12345ABCDEFG"},
+	{Key: "Content-Type", Value: "application/json"},
 }
 
 type AppView struct {
