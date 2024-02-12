@@ -54,3 +54,7 @@ func (c *AppController) AddHost() {
     c.view.OnStatusInputSubmit(cb)
     c.app.SetFocus(c.view.GetStatusBar())
 }
+
+func (c *AppController) DeleteHost(host model.Host) {
+    
+}

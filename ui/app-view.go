@@ -7,6 +7,8 @@ import (
 )
 
 var BG_COLOR = tcell.ColorDefault
+var BORDER_COLOR = tcell.ColorBlack
+var TITLE_COLOR = tcell.ColorMediumPurple
 
 type AppController interface {
 	SendRequest(index int)
@@ -15,13 +17,16 @@ type AppController interface {
 	DeleteRequest(index int)
 	GetRequests() ([]model.Request, error)
 	UpdateRequest(model.Request)
-	GetHosts() ([]model.Host, error)
-	SetHosts()
 	SelectRequest(index int)
 	SetRequests()
 	HandleRequestSelected(index int)
-    AddHost()
     EditRequestBody(req model.Request)
+
+    DeleteHost(host model.Host)
+    GetHosts() ([]model.Host, error)
+    SetHosts()
+    AddHost()
+
 }
 
 var defaultHeaders = []RequestHeader{
@@ -37,7 +42,7 @@ type AppView struct {
 	headersTable   *HeadersTable
 	RequestBody    *RequestBodyArea
 	RequestList    *RequestList
-	responseBox    *ResponseView
+	ResponseBox    *ResponseView
 
 	controller AppController
 }
@@ -52,7 +57,7 @@ func NewAppView() *AppView {
 		headersTable:   NewHeadersTable(),
 		RequestBody:    NewRequestBodyArea(),
 		RequestList:    NewRequestList(),
-		responseBox:    NewResponseView(),
+		ResponseBox:    NewResponseView(),
 	}
 }
 
@@ -74,7 +79,7 @@ func (v *AppView) GetPrimitive() tview.Primitive {
                     AddItem(v.headersTable.GetPrimitive(), 0, 5, false),
                     0, 5, false).
 
-                AddItem(v.responseBox.GetPrimitive(), 0, 5, false),
+                AddItem(v.ResponseBox.GetPrimitive(), 0, 5, false),
                 0, 1, false),
             0, 2, true,
         ).
@@ -85,8 +90,35 @@ func (v *AppView) GetPrimitive() tview.Primitive {
 
 	v.controller.SetHosts()
 	v.controller.SetRequests()
+    v.style()
 
 	return v.layout
+}
+
+
+func (v *AppView) style() {
+
+    type Styleable interface {
+        SetTitleColor(color tcell.Color) *tview.Box
+        SetBorderColor(color tcell.Color) *tview.Box
+        SetBackgroundColor(color tcell.Color) *tview.Box
+    }
+
+    components := []Styleable {
+        v.RequestList.view,
+        v.RequestBody.view,
+        v.MethodDropdown.view,
+        v.HostDropdown.view,
+        v.ResponseBox.view,
+        v.headersTable.view,
+        v.urlInput.view,
+    }
+
+    for _, c := range(components) {
+        c.SetBorderColor(BORDER_COLOR)
+        c.SetTitleColor(TITLE_COLOR)
+        c.SetBackgroundColor(BG_COLOR)
+    }
 }
 
 func (v *AppView) Bind(controller AppController) {
@@ -111,7 +143,7 @@ func (v *AppView) SetHosts(hosts []model.Host) {
 }
 
 func (v *AppView) SetResponse(body string) {
-	v.responseBox.SetContent(body)
+	v.ResponseBox.SetContent(body)
 }
 
 func (v *AppView) SetSelectedRequest(index int) {
@@ -127,7 +159,7 @@ func (v *AppView) RequestSelected(req model.Request) {
 	v.urlInput.SetText(req)
 	v.headersTable.DisplayHeaders(defaultHeaders)
 	v.RequestBody.SetRequest(req)
-	v.responseBox.SetContent(req.LastResponse.String)
+	v.ResponseBox.SetContent(req.LastResponse.String)
 }
 
 func (v *AppView) GetStatusBar() tview.Primitive {

@@ -38,6 +38,9 @@ func main() {
             case 'm':
                 app.SetFocus(view.MethodDropdown.GetPrimitive())
                 return nil
+            case 'p':
+                app.SetFocus(view.ResponseBox.GetPrimitive())
+                return nil
             case 'q':
                 app.Stop()
             case 'r':

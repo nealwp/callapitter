@@ -21,6 +21,7 @@ func NewHostDropdown() *HostDropdown {
 	view.SetFieldTextColor(BG_COLOR)
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
+    view.SetBorderColor(BORDER_COLOR)
 	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 	view.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
@@ -64,6 +65,9 @@ func (h *HostDropdown) setKeyBindings() {
 
 		if event.Key() == tcell.KeyRune {
 			switch event.Rune() {
+			case 'D':
+				h.handler.DeleteHost(h.hosts[index])
+				return nil
 			case 'j':
 				nextOption := (index + 1) % len(h.hosts)
 				h.view.SetCurrentOption(nextOption)

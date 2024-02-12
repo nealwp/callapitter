@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/gdamore/tcell/v2"
 	"github.com/nealwp/callapitter/model"
 	"github.com/rivo/tview"
 )
@@ -15,9 +16,9 @@ func NewUrlInput() *UrlInput {
 	title := "URL"
 
 	view := tview.NewTextView()
-	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 	view.SetTitle(title)
+    view.SetTextColor(tcell.ColorLime)
 	view.SetTitleAlign(tview.AlignLeft)
 
 	u := &UrlInput{view: view}

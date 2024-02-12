@@ -10,12 +10,11 @@ type ResponseView struct {
 
 func NewResponseView() *ResponseView {
 
-	title := "Response"
+	title := "Response (p)"
 
 	view := tview.NewTextView()
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
-	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 
 	return &ResponseView{view: view}

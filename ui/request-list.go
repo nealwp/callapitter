@@ -19,8 +19,9 @@ func NewRequestList() *RequestList {
 
 	view := tview.NewList()
 	view.ShowSecondaryText(false)
+    view.SetSelectedTextColor(tcell.ColorLime)
+    view.SetSelectedBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
-	view.SetBackgroundColor(BG_COLOR)
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetBorderPadding(1, 1, 1, 1)
