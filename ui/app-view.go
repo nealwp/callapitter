@@ -6,9 +6,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-var BG_COLOR = tcell.ColorDefault
-var BORDER_COLOR = tcell.ColorBlack
-var TITLE_COLOR = tcell.ColorMediumPurple
+var DEFAULT = tcell.ColorDefault
+var BLACK = tcell.ColorBlack
+var PURPLE = tcell.ColorMediumPurple
+var GREEN = tcell.ColorLime
 
 type AppController interface {
 	SendRequest(index int)
@@ -115,9 +116,9 @@ func (v *AppView) style() {
     }
 
     for _, c := range(components) {
-        c.SetBorderColor(BORDER_COLOR)
-        c.SetTitleColor(TITLE_COLOR)
-        c.SetBackgroundColor(BG_COLOR)
+        c.SetBorderColor(BLACK)
+        c.SetTitleColor(PURPLE)
+        c.SetBackgroundColor(DEFAULT)
     }
 }
 

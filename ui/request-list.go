@@ -20,13 +20,14 @@ func NewRequestList() *RequestList {
 	view := tview.NewList()
 	view.ShowSecondaryText(false)
     view.SetSelectedTextColor(tcell.ColorLime)
-    view.SetSelectedBackgroundColor(BG_COLOR)
+    view.SetSelectedBackgroundColor(DEFAULT)
 	view.SetBorder(true)
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetBorderPadding(1, 1, 1, 1)
-
+    
 	r := &RequestList{view: view}
+
 	r.setKeybindings()
 	r.setChangedFunc()
 	return r

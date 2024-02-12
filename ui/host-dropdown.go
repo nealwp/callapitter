@@ -17,12 +17,10 @@ func NewHostDropdown() *HostDropdown {
 	title := "Host (h)"
 
 	view := tview.NewDropDown()
-	view.SetFieldBackgroundColor(BG_COLOR)
-	view.SetFieldTextColor(BG_COLOR)
+	view.SetFieldBackgroundColor(DEFAULT)
+	view.SetFieldTextColor(DEFAULT)
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)
-    view.SetBorderColor(BORDER_COLOR)
-	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 	view.SetListStyles(tcell.StyleDefault.Background(tcell.ColorGray), tcell.StyleDefault.Dim(true))
 

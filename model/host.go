@@ -56,3 +56,19 @@ func (store *HostStore) GetHosts() ([]Host, error) {
 
 	return hosts, nil
 }
+
+func (s *HostStore) Delete(host Host) error {
+    stmt, err := s.DB.Prepare("DELETE FROM host WHERE id = ?")
+    if err != nil {
+        return err
+    }
+    defer stmt.Close()
+
+    _, err = stmt.Exec(host.Id)
+
+    if err != nil {
+        return err
+    }
+
+    return nil
+}

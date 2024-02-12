@@ -21,7 +21,7 @@ func NewMethodDropdown() *MethodDropdown {
 	view := tview.NewDropDown()
 	view.SetOptions(methods, nil)
 	view.SetCurrentOption(0)
-	view.SetFieldBackgroundColor(BG_COLOR)
+	view.SetFieldBackgroundColor(DEFAULT)
     view.SetFieldTextColor(tcell.ColorOrange)
 	view.SetTitle(title)
 	view.SetTitleAlign(tview.AlignLeft)

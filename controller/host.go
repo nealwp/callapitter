@@ -56,5 +56,17 @@ func (c *AppController) AddHost() {
 }
 
 func (c *AppController) DeleteHost(host model.Host) {
+    err := c.model.Host.Delete(host)
+    if err != nil {
+        c.view.SetStatus(err.Error())
+        return
+    }
     
+	hosts, err := c.GetHosts()
+	if err != nil {
+		c.view.SetStatus(err.Error())
+		return
+	}
+
+	c.view.SetHosts(hosts)
 }

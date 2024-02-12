@@ -14,11 +14,10 @@ type RequestBodyArea struct {
 
 func NewRequestBodyArea() *RequestBodyArea {
 	view := tview.NewTextView()
-	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
 	view.SetTitle("Body (b)")
 	view.SetTitleAlign(tview.AlignLeft)
-	view.SetTextStyle(tcell.StyleDefault.Background(BG_COLOR))
+	view.SetTextStyle(tcell.StyleDefault.Background(DEFAULT))
 
     r := &RequestBodyArea{view: view}
     r.setInputCapture()

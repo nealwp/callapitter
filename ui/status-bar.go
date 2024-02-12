@@ -18,9 +18,9 @@ func NewStatusBar() *StatusBar {
     view := tview.NewFlex().SetDirection(tview.FlexColumn).
         AddItem(label, 0, 1, false)
     
-    view.SetBackgroundColor(BG_COLOR)
-    label.SetBackgroundColor(BG_COLOR)
-	input.SetFieldBackgroundColor(BG_COLOR)
+    view.SetBackgroundColor(DEFAULT)
+    label.SetBackgroundColor(DEFAULT)
+	input.SetFieldBackgroundColor(DEFAULT)
 
     s := &StatusBar{view: view, label: label, Input: input}
     s.setInputCapture()
