@@ -75,7 +75,7 @@ func (r *RequestList) setKeybindings() {
 			case 'k':
 				r.handler.SelectRequest(index - 1)
             case 'R':
-                r.handler.EditRequest(index)
+                r.handler.EditRequest()
 			case '%':
 				r.handler.AddRequest()
 			}

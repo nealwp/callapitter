@@ -60,7 +60,9 @@ func (c *AppController) AddRequest() {
     c.app.SetFocus(c.view.GetStatusBar())
 }
 
-func (c *AppController) EditRequest(index int) {
+func (c *AppController) EditRequest() {
+    // copy selected before it changes
+    index := c.selectedRequestIdx
     req := c.model.Request.GetRequest(index)
 
     c.view.SetStatus("Enter request endpoint:")
@@ -70,6 +72,7 @@ func (c *AppController) EditRequest(index int) {
         if endpoint != "" {
             c.UpdateRequest(model.Request{ Id: req.Id, Method: req.Method, Endpoint: endpoint, Body: req.Body })
             c.view.SetStatus("Request updated: " + endpoint)
+            c.view.SetSelectedRequest(index)
         } else {
             c.view.SetStatus("")
         }
@@ -92,6 +95,7 @@ func (c *AppController) SetRequests() {
 }
 
 func (c *AppController) HandleRequestSelected(index int) {
+    c.selectedRequestIdx = index
 	req := c.model.Request.GetRequest(index)
 	c.view.RequestSelected(req)
 }
@@ -116,6 +120,7 @@ func (c *AppController) DeleteRequest(index int) {
 }
 
 func (c *AppController) SelectRequest(index int) {
+    c.selectedRequestIdx = index
 	c.view.SetSelectedRequest(index)
 }
 
@@ -128,6 +133,7 @@ func (c *AppController) GetRequests() ([]model.Request, error) {
 }
 
 func (c *AppController) UpdateRequest(req model.Request) {
+    index := c.selectedRequestIdx
 	err := c.model.Request.UpdateRequest(req)
 
 	if err != nil {
@@ -143,6 +149,7 @@ func (c *AppController) UpdateRequest(req model.Request) {
 	}
 
 	c.view.SetRequests(requests)
+    c.view.SetSelectedRequest(index)
 }
 
 func (c *AppController) EditRequestBody(req model.Request) {

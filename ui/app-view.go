@@ -14,7 +14,7 @@ var GREEN = tcell.ColorLime
 type AppController interface {
 	SendRequest(index int)
 	AddRequest()
-    EditRequest(index int)
+    EditRequest()
 	DeleteRequest(index int)
 	GetRequests() ([]model.Request, error)
 	UpdateRequest(model.Request)

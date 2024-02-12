@@ -14,6 +14,8 @@ type AppController struct {
 	model *model.AppModel
 	view  *ui.AppView
     app *tview.Application
+
+    selectedRequestIdx int
 }
 
 func NewAppController() *AppController {
