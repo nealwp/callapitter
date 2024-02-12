@@ -14,7 +14,7 @@ type HostDropdown struct {
 
 func NewHostDropdown() *HostDropdown {
 
-	title := "Host"
+	title := "Host (h)"
 
 	view := tview.NewDropDown()
 	view.SetFieldBackgroundColor(BG_COLOR)

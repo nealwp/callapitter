@@ -15,7 +15,7 @@ type RequestList struct {
 
 func NewRequestList() *RequestList {
 
-	title := "Requests"
+	title := "Requests (r)"
 
 	view := tview.NewList()
 	view.ShowSecondaryText(false)
@@ -72,8 +72,10 @@ func (r *RequestList) setKeybindings() {
 				r.handler.SelectRequest(index + 1)
 			case 'k':
 				r.handler.SelectRequest(index - 1)
+            case 'R':
+                r.handler.EditRequest(index)
 			case '%':
-				r.handler.CreateRequest()
+				r.handler.AddRequest()
 			}
 			return event
 		} else if event.Key() == tcell.KeyEnter {

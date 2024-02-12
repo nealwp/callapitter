@@ -14,7 +14,6 @@ func main() {
     view := ui.NewAppView()
 	controller := controller.NewAppController()
 
-	components := view.GetFocusableComponents()
 
     app := tview.NewApplication()
 
@@ -23,18 +22,28 @@ func main() {
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
-		case tcell.KeyTab:
-			focusNext(app, components)
-			return nil
-		case tcell.KeyBacktab:
-			focusPrevious(app, components)
-			return nil
 		case tcell.KeyCtrlC:
 			return nil
 		case tcell.KeyRune:
-			if event.Rune() == 'q' {
-				app.Stop()
-			}
+            if app.GetFocus() == view.StatusBar.Input {
+                return event 
+            }
+            switch event.Rune() {
+            case 'b':
+                app.SetFocus(view.RequestBody.GetPrimitive())
+                return nil
+            case 'h':
+                app.SetFocus(view.HostDropdown.GetPrimitive())
+                return nil
+            case 'm':
+                app.SetFocus(view.MethodDropdown.GetPrimitive())
+                return nil
+            case 'q':
+                app.Stop()
+            case 'r':
+                app.SetFocus(view.RequestList.GetPrimitive())
+                return nil
+            }
 		}
 		return event
 	})
@@ -46,26 +55,3 @@ func main() {
 	}
 }
 
-func focusNext(app *tview.Application, components []tview.Primitive) {
-
-	currentFocus := app.GetFocus()
-	for i, component := range components {
-		if component == currentFocus {
-			nextIndex := (i + 1) % len(components)
-			app.SetFocus(components[nextIndex])
-			break
-		}
-	}
-}
-
-func focusPrevious(app *tview.Application, components []tview.Primitive) {
-
-	currentFocus := app.GetFocus()
-	for i, component := range components {
-		if component == currentFocus {
-			prevIndex := (i - 1 + len(components)) % len(components)
-			app.SetFocus(components[prevIndex])
-			break
-		}
-	}
-}

@@ -16,7 +16,7 @@ func NewRequestBodyArea() *RequestBodyArea {
 	view := tview.NewTextView()
 	view.SetBackgroundColor(BG_COLOR)
 	view.SetBorder(true)
-	view.SetTitle("Body")
+	view.SetTitle("Body (b)")
 	view.SetTitleAlign(tview.AlignLeft)
 	view.SetTextStyle(tcell.StyleDefault.Background(BG_COLOR))
 

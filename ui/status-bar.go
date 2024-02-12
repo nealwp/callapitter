@@ -7,7 +7,7 @@ import (
 
 type StatusBar struct {
 	view *tview.Flex
-    input *tview.InputField
+    Input *tview.InputField
     label *tview.TextView
 }
 
@@ -22,7 +22,9 @@ func NewStatusBar() *StatusBar {
     label.SetBackgroundColor(BG_COLOR)
 	input.SetFieldBackgroundColor(BG_COLOR)
 
-    return &StatusBar{view: view, label: label, input: input}
+    s := &StatusBar{view: view, label: label, Input: input}
+    s.setInputCapture()
+    return s
 }
 
 func (s *StatusBar) GetPrimitive() tview.Primitive {
@@ -30,24 +32,32 @@ func (s *StatusBar) GetPrimitive() tview.Primitive {
 }
 
 func (s *StatusBar) GetInputField() tview.Primitive {
-    return s.input
+    return s.Input
 }
 
 func (s *StatusBar) SetStatus(msg string) {
 	s.label.SetText(msg)
 }
 
+func (s *StatusBar) setInputCapture() {
+    keybinds := func(event *tcell.EventKey) *tcell.EventKey {
+        return event
+    }
+
+    s.Input.SetInputCapture(keybinds)
+}
+
 func (s *StatusBar) OnInput(callback func(value string)) {
-    s.view.AddItem(s.input, 0, 8, false)
-    s.input.SetDoneFunc(func (key tcell.Key) {
+    s.view.AddItem(s.Input, 0, 8, false)
+    s.Input.SetDoneFunc(func (key tcell.Key) {
         if key == tcell.KeyEnter {
-            callback(s.input.GetText())        
-            s.input.SetText("")
-            s.view.RemoveItem(s.input)
+            callback(s.Input.GetText())        
+            s.Input.SetText("")
+            s.view.RemoveItem(s.Input)
         } else if key == tcell.KeyEscape {
-            s.input.SetText("")
+            s.Input.SetText("")
             callback("")        
-            s.view.RemoveItem(s.input)
+            s.view.RemoveItem(s.Input)
         }
     })
 }

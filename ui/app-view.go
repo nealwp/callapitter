@@ -10,7 +10,8 @@ var BG_COLOR = tcell.ColorDefault
 
 type AppController interface {
 	SendRequest(index int)
-	CreateRequest()
+	AddRequest()
+    EditRequest(index int)
 	DeleteRequest(index int)
 	GetRequests() ([]model.Request, error)
 	UpdateRequest(model.Request)
@@ -29,13 +30,13 @@ var defaultHeaders = []RequestHeader{
 
 type AppView struct {
 	layout         *tview.Flex
-	statusBar      *StatusBar
-	methodDropdown *MethodDropdown
+	StatusBar      *StatusBar
+	MethodDropdown *MethodDropdown
 	HostDropdown   *HostDropdown
 	urlInput       *UrlInput
 	headersTable   *HeadersTable
 	RequestBody    *RequestBodyArea
-	requestList    *RequestList
+	RequestList    *RequestList
 	responseBox    *ResponseView
 
 	controller AppController
@@ -44,13 +45,13 @@ type AppView struct {
 func NewAppView() *AppView {
 	return &AppView{
 		layout:         tview.NewFlex(),
-		statusBar:      NewStatusBar(),
-		methodDropdown: NewMethodDropdown(),
+		StatusBar:      NewStatusBar(),
+		MethodDropdown: NewMethodDropdown(),
 		HostDropdown:   NewHostDropdown(),
 		urlInput:       NewUrlInput(),
 		headersTable:   NewHeadersTable(),
 		RequestBody:    NewRequestBodyArea(),
-		requestList:    NewRequestList(),
+		RequestList:    NewRequestList(),
 		responseBox:    NewResponseView(),
 	}
 }
@@ -59,11 +60,11 @@ func (v *AppView) GetPrimitive() tview.Primitive {
 
     v.layout.AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
         AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-            AddItem(v.requestList.GetPrimitive(), 50, 1, true).
+            AddItem(v.RequestList.GetPrimitive(), 50, 1, true).
                 AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 
                 AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-                    AddItem(v.methodDropdown.GetPrimitive(), 15, 1, false).
+                    AddItem(v.MethodDropdown.GetPrimitive(), 15, 1, false).
                     AddItem(v.HostDropdown.GetPrimitive(), 45, 1, false).
                     AddItem(v.urlInput.GetPrimitive(), 0, 1, false),
                     3, 1, false).
@@ -78,7 +79,7 @@ func (v *AppView) GetPrimitive() tview.Primitive {
             0, 2, true,
         ).
 
-        AddItem(v.statusBar.GetPrimitive(), 1, 1, false), 
+        AddItem(v.StatusBar.GetPrimitive(), 1, 1, false), 
         0, 1, true,
     )
 
@@ -88,34 +89,21 @@ func (v *AppView) GetPrimitive() tview.Primitive {
 	return v.layout
 }
 
-func (v *AppView) GetFocusableComponents() []tview.Primitive {
-	focusables := []tview.Primitive{
-		v.requestList.GetPrimitive(),
-		v.methodDropdown.GetPrimitive(),
-		v.HostDropdown.GetPrimitive(),
-		v.urlInput.GetPrimitive(),
-		v.RequestBody.GetPrimitive(),
-		v.headersTable.GetPrimitive(),
-		v.responseBox.GetPrimitive(),
-	}
-	return focusables
-}
-
 func (v *AppView) Bind(controller AppController) {
 	v.controller = controller
-	v.methodDropdown.Bind(controller)
+	v.MethodDropdown.Bind(controller)
 	v.urlInput.Bind(controller)
-	v.requestList.Bind(controller)
+	v.RequestList.Bind(controller)
     v.HostDropdown.Bind(controller)
     v.RequestBody.Bind(controller)
 }
 
 func (v *AppView) SetStatus(status string) {
-	v.statusBar.SetStatus(status)
+	v.StatusBar.SetStatus(status)
 }
 
 func (v *AppView) SetRequests(requests []model.Request) {
-	v.requestList.SetContent(requests)
+	v.RequestList.SetContent(requests)
 }
 
 func (v *AppView) SetHosts(hosts []model.Host) {
@@ -127,7 +115,7 @@ func (v *AppView) SetResponse(body string) {
 }
 
 func (v *AppView) SetSelectedRequest(index int) {
-	v.requestList.SetSelectedRequest(index)
+	v.RequestList.SetSelectedRequest(index)
 }
 
 func (v *AppView) GetSelectedHost() string {
@@ -135,7 +123,7 @@ func (v *AppView) GetSelectedHost() string {
 }
 
 func (v *AppView) RequestSelected(req model.Request) {
-	v.methodDropdown.SetCurrentOption(req)
+	v.MethodDropdown.SetCurrentOption(req)
 	v.urlInput.SetText(req)
 	v.headersTable.DisplayHeaders(defaultHeaders)
 	v.RequestBody.SetRequest(req)
@@ -143,9 +131,9 @@ func (v *AppView) RequestSelected(req model.Request) {
 }
 
 func (v *AppView) GetStatusBar() tview.Primitive {
-    return v.statusBar.GetInputField()
+    return v.StatusBar.GetInputField()
 }
 
 func (v *AppView) OnStatusInputSubmit(cb func(value string)) {
-    v.statusBar.OnInput(cb)
+    v.StatusBar.OnInput(cb)
 }

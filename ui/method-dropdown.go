@@ -16,7 +16,7 @@ var methods = []string{"GET", "POST", "PUT", "DELETE"}
 
 func NewMethodDropdown() *MethodDropdown {
 
-	title := "Method"
+	title := "Method (m)"
 
 	view := tview.NewDropDown()
 	view.SetOptions(methods, nil)

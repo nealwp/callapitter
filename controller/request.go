@@ -25,9 +25,7 @@ func (c *AppController) SendRequest(i int) {
 	//l.requests[index].LastResponse = sql.NullString{String: res.Body, Valid: true}
 }
 
-func (c *AppController) CreateRequest() {
-
-	req := model.Request{Method: "GET", Endpoint: "/"}
+func (c *AppController) CreateRequest(req model.Request) {
 
 	err := c.model.Request.InsertRequest(req)
 	if err != nil {
@@ -42,6 +40,45 @@ func (c *AppController) CreateRequest() {
 	}
 
 	c.view.SetRequests(requests)
+}
+
+func (c *AppController) AddRequest() {
+    c.view.SetStatus("Enter request endpoint:")
+
+    cb := func(endpoint string) {
+        if endpoint != "" {
+            c.CreateRequest(model.Request{Method: "GET", Endpoint: endpoint})
+            c.view.SetStatus("Request created: " + endpoint)
+        } else {
+            c.view.SetStatus("")
+        }
+
+        c.app.SetFocus(c.view.RequestList.GetPrimitive())
+    }
+
+    c.view.OnStatusInputSubmit(cb)
+    c.app.SetFocus(c.view.GetStatusBar())
+}
+
+func (c *AppController) EditRequest(index int) {
+    req := c.model.Request.GetRequest(index)
+
+    c.view.SetStatus("Enter request endpoint:")
+    c.view.StatusBar.Input.SetText(req.Endpoint)
+
+    cb := func(endpoint string) {
+        if endpoint != "" {
+            c.UpdateRequest(model.Request{ Id: req.Id, Method: req.Method, Endpoint: endpoint, Body: req.Body })
+            c.view.SetStatus("Request updated: " + endpoint)
+        } else {
+            c.view.SetStatus("")
+        }
+
+        c.app.SetFocus(c.view.RequestList.GetPrimitive())
+    }
+
+    c.view.OnStatusInputSubmit(cb)
+    c.app.SetFocus(c.view.GetStatusBar())
 }
 
 func (c *AppController) SetRequests() {
