@@ -10,6 +10,7 @@ var DEFAULT = tcell.ColorDefault
 var BLACK = tcell.ColorBlack
 var PURPLE = tcell.ColorMediumPurple
 var GREEN = tcell.ColorLime
+var ORANGE = tcell.ColorOrange
 
 type AppController interface {
 	SendRequest(index int)
